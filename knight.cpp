@@ -138,20 +138,189 @@ void display(int* nOut)
 }
 
 
+// -- Code section
+#define RESULT(hp, level, remedy, maidenkiss, pheonixdown) (hp+level+remedy+maidenkiss+pheonixdown)
+#define MIN(a, b) (a<b?a:b)
+#define MAX(a, b) (a>b?a:b)
+
+enum Opponent {
+    MADBEAR_ = 1,
+    BANDIT_,
+    LORDLUPIN,
+    ELF,
+    TROLL,
+    SHAMAN,
+    VAJSH,
+    BOWSER = 99
+};
+
+enum Item {
+    EXCALIBUR = 8,
+    MYTHRIL,
+    EXCALIPOOR,
+    MUSHMARIO,
+    MUSHFIB,
+    MUSHGHOST,
+    MUSHKNIGHT,
+    REMEDY,
+    MAINDENKISS,
+    PHOENIXDOWN,
+    LIGHTWING = 21,
+    DRAGONSWORD = 23
+};
+
+enum Special {
+    SURRENDER = 0,
+    MERLIN = 18,
+    ABYSS = 19,
+    GUNIEVERE = 20,
+    ODIN = 22
+};
+
+enum Character {
+    ARTHUR = 0,
+    LANCELOT,
+    PALADIN,
+    DRAGONKNIGHT,
+    KNIGHT,
+    DWARF,
+    FROG
+};
+
+enum GameState {
+    RUNNING = 0,
+    GAMEOVER,
+    FINISHED
+} Game;
+
+
+void handle_fight(struct knight *theKnight, int& character, int maxHP, int opponent, int eventNum)
+{
+    int level = theKnight->level;
+    int b = eventNum % 10;
+    int level_oppnent = eventNum>6 ? (b>5?b:5):b;
+
+    /*
+     *bool autowin = (    character == Character::ARTHUR          ||
+     *                    character == Character::DRAGONKNIGHT    || 
+     *                    (character == Character::LANCELOT && (level & 1UL)) ||
+     *                    (character == Character::PALADIN && (level >= 8) )  ||
+     *                    (character == Character::KNIGHT && (level == 10))
+     *                );
+     */
+
+    switch (opponent) {
+        case Opponent::BOWSER: { // 99
+            // Win
+            if (character == Character::ARTHUR              || 
+                    character == Character::DRAGONKNIGHT    || 
+                    (character == Character::LANCELOT && (level & 1UL)) ||
+                    (character == Character::PALADIN && (level >= 8) )  ||
+                    (character == Character::KNIGHT && (level == 10))) 
+            {
+                theKnight->level = 10;
+            } else // Lose
+                Game = GameState::GAMEOVER;
+        } return;
+
+        case Opponent::VAJSH: { // 7
+            // Win
+            if (character == Character::ARTHUR                  || 
+                    (character == Character::DRAGONKNIGHT)      || 
+                    (character == Character::PALADIN            ||
+                    (character == Character::LANCELOT && (level & 1UL)) ||
+                    (character == Character::LANCELOT && !(level & 1UL) && (level > level_oppnent)) ||
+                    (character == Character::KNIGHT && (level > level_oppnent))))
+            {
+                theKnight->level = MIN(10, level + 2);
+            }
+            // Lose
+            else if (character != Character::DWARF && character != Character::FROG && level < level_oppnent) {
+                if (theKnight->maidenkiss > 0)
+                    theKnight->maidenkiss--;
+                else {
+                    theKnight->level = 1;
+                    character = Character::FROG;
+                }
+            }
+        } return;
+
+        case Opponent::SHAMAN: { // 6
+            // Win
+            if (character == Character::ARTHUR                  || 
+                    (character == Character::DRAGONKNIGHT)      || 
+                    (character == Character::PALADIN            ||
+                    (character == Character::LANCELOT && (level & 1UL)) ||
+                    (character == Character::LANCELOT && !(level & 1UL) && (level > level_oppnent)) ||
+                    (character == Character::KNIGHT && (level > level_oppnent))))
+            {
+                theKnight->level = MIN(10, level + 2);
+            }
+            // Loose
+            else if (character != Character::DWARF && character != Character::FROG && level < level_oppnent) {
+                theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
+                if (theKnight->remedy > 0) {
+                    theKnight->remedy--;
+                    theKnight->HP = MIN(maxHP, 5*theKnight->HP);
+                }
+                else
+                    character = Character::DWARF;
+            }
+        } return;
+
+        default: {
+            // Win
+            if (character == Character::ARTHUR                  || 
+                    (character == Character::DRAGONKNIGHT)      || 
+                    (character == Character::PALADIN            ||
+                    (character == Character::LANCELOT && (level & 1UL)) ||
+                    (character == Character::LANCELOT && !(level & 1UL) && (level > level_oppnent)) ||
+                    (character == Character::KNIGHT && (level > level_oppnent))))
+            {
+                theKnight->level = MIN(10, level + 1);
+            }
+            // Loose
+            else if (level < level_oppnent) {
+                float basedame = 1.0f;
+                if (opponent == Opponent::BANDIT_)          basedame = 1.5;
+                else if (opponent == Opponent::LORDLUPIN)   basedame = 4.5;
+                else if (opponent == Opponent::ELF)         basedame = 6.5;
+                else if (opponent == Opponent::TROLL)       basedame = 8.5;
+
+                theKnight->HP = (int)(theKnight->HP - level_oppnent*basedame*10.0f);
+            }
+        } break;
+    }
+
+    if (theKnight->HP <= 0) {
+        if (theKnight->phoenixdown > 0) {
+            theKnight->phoenixdown--;
+            theKnight->HP = maxHP;
+
+            // TODO: character
+        }
+        else
+            Game = GameState::GAMEOVER;
+    }
+}
+
 int main(int argc, char** argv)
 {
     if (argc < 2) return 1;
     const char* filename = argv[1];;
 
-   struct knight theKnight;
-   int nEvent; //number of events
-   int* arrEvent = new int[EVENT_SIZE]; // array of events
-   int* nOut;                           // final result
+    struct knight theKnight;
+    int nEvent; //number of events
+    int* arrEvent = new int[EVENT_SIZE]; // array of events
+    int* nOut;                           // final result
     int i;
 
 	readFile(filename, theKnight, nEvent, arrEvent);
 	//cout << theKnight.HP << ' ' << theKnight.level << ' ' << theKnight.remedy << ' ' << theKnight.maidenkiss << ' ' << theKnight.phoenixdown << endl;
 
+    // TODO: Check identity
+
+    // TODO: Enter event loop
 	for (i = 0; i < nEvent; i++)
 	{
 		int theEvent = arrEvent[i];
