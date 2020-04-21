@@ -12,6 +12,65 @@ const int BANDIT = 2;
 const int EVENT_SIZE = 100;
 const int MAX_CHARACTER_EACH_LINE = 250;
 
+// -- Code section
+
+#define TEST_1920005
+
+#define RESULT(hp, level, remedy, maidenkiss, pheonixdown) (hp+level+remedy+maidenkiss+pheonixdown)
+#define MIN(a, b) (a<b?a:b)
+#define MAX(a, b) (a>b?a:b)
+
+enum Opponent {
+    MADBEAR_ = 1,
+    BANDIT_,
+    LORDLUPIN,
+    ELF,
+    TROLL,
+    SHAMAN,
+    VAJSH,
+    BOWSER = 99
+};
+
+enum Item {
+    EXCALIBUR = 8,
+    MYTHRIL,
+    EXCALIPOOR,
+    MUSHMARIO,
+    MUSHFIB,
+    MUSHGHOST,
+    MUSHKNIGHT,
+    REMEDY,
+    MAINDENKISS,
+    PHOENIXDOWN,
+    LIGHTWING = 21,
+    DRAGONSWORD = 23
+};
+
+enum Special {
+    SURRENDER = 0,
+    MERLIN = 18,
+    ABYSS = 19,
+    GUNIEVERE = 20,
+    ODIN = 22
+};
+
+enum Character {
+    ARTHUR = 0,
+    LANCELOT,
+    PALADIN,
+    DRAGONKNIGHT,
+    UNDRAGONKNIGHT,
+    KNIGHT,
+    DWARF,
+    FROG
+};
+
+enum GameState {
+    RUNNING = 0,
+    GAMEOVER,
+    FINISHED
+} Game;
+
 struct knight
 {
    int HP;
@@ -19,7 +78,15 @@ struct knight
    int remedy;
    int maidenkiss;
    int phoenixdown;
+
+   int maxHP;
+   int previousHP;
+   int previousLevel;
+   int numCursed;
+   Character character;
+   Character trueCharacter;
 };
+
 
 // read data from input file to corresponding variables
 // return 1 if successfully done, otherwise return 0
@@ -138,66 +205,12 @@ void display(int* nOut)
 }
 
 
-// -- Code section
-#define RESULT(hp, level, remedy, maidenkiss, pheonixdown) (hp+level+remedy+maidenkiss+pheonixdown)
-#define MIN(a, b) (a<b?a:b)
-#define MAX(a, b) (a>b?a:b)
+// Function define
 
-enum Opponent {
-    MADBEAR_ = 1,
-    BANDIT_,
-    LORDLUPIN,
-    ELF,
-    TROLL,
-    SHAMAN,
-    VAJSH,
-    BOWSER = 99
-};
-
-enum Item {
-    EXCALIBUR = 8,
-    MYTHRIL,
-    EXCALIPOOR,
-    MUSHMARIO,
-    MUSHFIB,
-    MUSHGHOST,
-    MUSHKNIGHT,
-    REMEDY,
-    MAINDENKISS,
-    PHOENIXDOWN,
-    LIGHTWING = 21,
-    DRAGONSWORD = 23
-};
-
-enum Special {
-    SURRENDER = 0,
-    MERLIN = 18,
-    ABYSS = 19,
-    GUNIEVERE = 20,
-    ODIN = 22
-};
-
-enum Character {
-    ARTHUR = 0,
-    LANCELOT,
-    PALADIN,
-    DRAGONKNIGHT,
-    UNDRAGONKNIGHT,
-    KNIGHT,
-    DWARF,
-    FROG
-};
-
-enum GameState {
-    RUNNING = 0,
-    GAMEOVER,
-    FINISHED
-} Game;
-
-
-void handle_fight(struct knight *theKnight, int& character, int maxHP, int opponent, int eventNum)
+void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
 {
     int level = theKnight->level;
+    Character character = theKnight->character;
     int b = eventNum % 10;
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
 
@@ -230,8 +243,10 @@ void handle_fight(struct knight *theKnight, int& character, int maxHP, int oppon
                 if (theKnight->maidenkiss > 0)
                     theKnight->maidenkiss--;
                 else {
+                    theKnight->previousLevel = theKnight->level;
                     theKnight->level = 1;
-                    character = Character::FROG;
+                    theKnight->character = Character::FROG;
+                    theKnight->numCursed = 3;
                 }
             }
         } return;
@@ -242,10 +257,12 @@ void handle_fight(struct knight *theKnight, int& character, int maxHP, int oppon
                 theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
                 if (theKnight->remedy > 0) {
                     theKnight->remedy--;
-                    theKnight->HP = MIN(maxHP, 5*theKnight->HP);
+                    theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
                 }
-                else
-                    character = Character::DWARF;
+                else {
+                    theKnight->character = Character::DWARF;
+                    theKnight->numCursed = 3;
+                }
             }
         } return;
 
@@ -263,12 +280,16 @@ void handle_fight(struct knight *theKnight, int& character, int maxHP, int oppon
         } break;
     }
 
+    // Check die
+    // Use phoenix if die.
     if (theKnight->HP <= 0) {
         if (theKnight->phoenixdown > 0) {
             theKnight->phoenixdown--;
-            theKnight->HP = maxHP;
+            theKnight->HP = theKnight->maxHP;
+            theKnight->character = theKnight->trueCharacter;
 
-            // TODO: character
+            if(theKnight->character == Character::FROG)
+                theKnight->level = theKnight->previousLevel;
         }
         else
             Game = GameState::GAMEOVER;
@@ -292,8 +313,43 @@ bool check_prime(int number) {
 }
 
 bool check_dragonknight(int number) {
-    // TODO:
+    /* -- x^2 + y^2 =z^2
+     * |
+     * -- x + y + z = number
+     * x = m^2 - n^2
+     * y = 2*m*n
+     * z = m^2 + n^2
+     *
+     * Solution
+     * 0 < (number - m*m)/m < m
+     */
 
+    // 3 + 4 + 5 = 12
+    if(number < 12 || number > 999)
+        return false;
+    // Odd number
+    if (number & 1UL)
+        return false;
+
+    int N = number/2;
+    int m = 1;
+    for( ; ; m++) {
+
+        // m*m < number
+        long long temp = m*m;
+        if (N < temp)
+            break;
+
+        // check number/m is integer
+        if (N % m != 0)
+            continue;
+
+        // check number < 2*m*m
+        if (N/2 > temp)
+            continue;
+
+        return true;
+    }
     return false;
 }
 
@@ -310,6 +366,8 @@ Character get_character(int orignalHP) {
     return Character::KNIGHT;
 }
 
+
+#ifndef TEST_1920005
 int main(int argc, char** argv)
 {
     if (argc < 2) return 1;
@@ -325,7 +383,7 @@ int main(int argc, char** argv)
 	//cout << theKnight.HP << ' ' << theKnight.level << ' ' << theKnight.remedy << ' ' << theKnight.maidenkiss << ' ' << theKnight.phoenixdown << endl;
 
     // Check identity
-    Character o_character = get_character(theKnight.HP);
+    theKnight.trueCharacter = theKnight.character = get_character(theKnight.HP);
 
     // TODO: Enter event loop
 	for (i = 0; i < nEvent; i++)
@@ -347,4 +405,12 @@ int main(int argc, char** argv)
     display(nOut);
 	return 0;
 }
+#endif
 
+/*
+ *int main()
+ *{
+ *    check_dragonknight(12);
+ *    return 0;
+ *}
+ */
