@@ -1,8 +1,6 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
-
-bool check_prime(int);
-bool check_dragonknight(int);
+#include "knight.h"
 
 #define sum(a,b,c) (a+b+c)
 
@@ -35,6 +33,47 @@ TEST_CASE("Check dragon knight", "[check_dragonknight]") {
     REQUIRE_FALSE(check_dragonknight(sum(9999,200,10001)));
 }
 
+void set_knight(struct knight *theKnight, int HP, int level, int remedy, int maidenkiss, int phoenixdown) {
+    theKnight->HP = HP;
+    theKnight->level = level;
+    theKnight->remedy = remedy;
+    theKnight->maidenkiss = maidenkiss;
+    theKnight->phoenixdown = phoenixdown;
+}
+
+TEST_CASE("Check fight", "[handle_fight]") {
+    struct knight theKnight;
+    {   set_knight(&theKnight, 172, 2, 0, 1, 0);
+        int events[1] = {5};
+        REQUIRE(game_main(&theKnight, events, 1) == 176); }
+
+    {   set_knight(&theKnight, 172, 1, 0, 1, 0);
+        int events[2] = {5,2};
+        REQUIRE(game_main(&theKnight, events, 2) == 144); }
+
+    {   set_knight(&theKnight, 152, 1, 0, 1, 0);
+        int events[3] = {3,5,7};
+        REQUIRE(game_main(&theKnight, events, 3) == -1); }
+
+    {   set_knight(&theKnight, 152, 1, 0, 1, 1);
+        int events[2] = {3,5};
+        REQUIRE(game_main(&theKnight, events, 2) == 154); }
+
+    {   set_knight(&theKnight, 152, 1 , 0, 0, 0);
+        int events[3] = {4,6,5};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
+
+    // Check Dwarf
+    {   set_knight(&theKnight, 998, 1 , 0, 0, 0);
+        int events[] = {4,6,1,1,1};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 396); }
+
+    {   set_knight(&theKnight, 998, 1 , 2, 0, 0);
+        int events[] = {4,6,1};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 967); }
+
+    // Check Frog
+}
 
 /*
  *TEST_CASE( "Final Result", "[prob_calculator_main]" ) {

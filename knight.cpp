@@ -206,6 +206,15 @@ void display(int* nOut)
 
 
 // Function define
+void handle_item(struct knight *theKnight, Item item, int eventNum)
+{
+
+}
+
+void handle_special(struct knight *theKnight, Special event, int eventNum)
+{
+
+}
 
 void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
 {
@@ -367,6 +376,43 @@ Character get_character(int orignalHP) {
 }
 
 
+int game_main(struct knight *theKnight, int *events, int numEvents)
+{
+    int nOut = -1;
+    theKnight->maxHP = theKnight->HP;
+    theKnight->trueCharacter = theKnight->character = get_character(theKnight->HP);
+    Game = GameState::RUNNING;
+
+    int i;
+	for (i = 0; i < numEvents; i++)
+	{
+        if (Game == GameState::GAMEOVER) break;
+        theKnight->numCursed -= (int) ((theKnight->numCursed & 0x01) || (theKnight->numCursed & 0x02));
+
+        int theEvent = events[i];
+        if ((theEvent >= 1 && theEvent <= 7) || theEvent == 99)
+            handle_fight(theKnight, (Opponent) theEvent,i+1);
+        else if (theEvent >= 8 && theEvent <= 17)
+            handle_item(theKnight, (Item) theEvent, i+1);
+        else if (theEvent >= 18 && theEvent <= 23)
+            handle_special(theKnight, (Special) theEvent, i+1);
+
+        // Check magic cursed (FROG, DWARF)
+        if (theKnight->character == Character::FROG && theKnight->numCursed == 0) {
+            theKnight->level = theKnight->previousLevel;
+            theKnight->character = theKnight->trueCharacter;
+        }
+        else if (theKnight->character == Character::DWARF && theKnight->numCursed == 0) {
+            theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
+            theKnight->character = theKnight->trueCharacter;
+        }
+	}
+    if (Game != GameState::GAMEOVER && i == numEvents)
+        nOut = RESULT(theKnight->HP, theKnight->level, theKnight->remedy,
+                    theKnight->maidenkiss, theKnight->phoenixdown);
+    return nOut;
+};
+
 #ifndef TEST_1920005
 int main(int argc, char** argv)
 {
@@ -382,35 +428,22 @@ int main(int argc, char** argv)
 	readFile(filename, theKnight, nEvent, arrEvent);
 	//cout << theKnight.HP << ' ' << theKnight.level << ' ' << theKnight.remedy << ' ' << theKnight.maidenkiss << ' ' << theKnight.phoenixdown << endl;
 
-    // Check identity
-    theKnight.trueCharacter = theKnight.character = get_character(theKnight.HP);
-
     // TODO: Enter event loop
-	for (i = 0; i < nEvent; i++)
-	{
-		int theEvent = arrEvent[i];
-		//cout << theEvent << endl;
-		switch (theEvent)
-		{
-		case MADBEAR:
-			//deal with MadBear here
-		break;
-
-		case BANDIT:
-			//deal with Bandit here
-		break;
-		}
-	}
-
+    *nOut = game_main(&theKnight, arrEvent, nEvent);
     display(nOut);
-	return 0;
+    return 0;
 }
 #endif
 
 /*
- *int main()
- *{
- *    check_dragonknight(12);
+ *
+ * int main()
+ * {
+ *
+ *    struct knight theKnight = {.HP=998, .level=1, .remedy=0, .maidenkiss=0, .phoenixdown=0};
+ *    int events[] = {4,6,1,1,1};
+ *    game_main(&theKnight, events, 5);
  *    return 0;
- *}
+ * }
  */
+ 
