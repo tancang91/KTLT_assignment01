@@ -33,6 +33,15 @@ TEST_CASE("Check dragon knight", "[check_dragonknight]") {
     REQUIRE_FALSE(check_dragonknight(sum(9999,200,10001)));
 }
 
+TEST_CASE("Check next fib", "[get_fib]") {
+    REQUIRE(get_fib(12) == 13);
+    REQUIRE(get_fib(300) == 377);
+    REQUIRE(get_fib(610) == 987);
+    REQUIRE(get_fib(1) == 2);
+    REQUIRE(get_fib(50) == 55);
+}
+
+struct knight theKnight;
 void set_knight(struct knight *theKnight, int HP, int level, int remedy, int maidenkiss, int phoenixdown) {
     theKnight->HP = HP;
     theKnight->level = level;
@@ -42,7 +51,6 @@ void set_knight(struct knight *theKnight, int HP, int level, int remedy, int mai
 }
 
 TEST_CASE("Check fight", "[handle_fight]") {
-    struct knight theKnight;
     {   set_knight(&theKnight, 172, 2, 0, 1, 0);
         int events[1] = {5};
         REQUIRE(game_main(&theKnight, events, 1) == 176); }
@@ -73,6 +81,83 @@ TEST_CASE("Check fight", "[handle_fight]") {
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 967); }
 
     // Check Frog
+    {   set_knight(&theKnight, 998, 1 , 0, 0, 0);
+        int events[] = {4,6,7};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 200); }
+
+    // Check BOWSER
+    {   set_knight(&theKnight, 998, 1 , 0, 0, 0);
+        int events[] = {4,99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
+
+    {   set_knight(&theKnight, 999, 1 , 0, 0, 0); // Arthur
+        int events[] = {4,99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 1009); }
+
+    {   set_knight(&theKnight, 888, 2, 0, 0, 0); // Lancelot, even number
+        int events[] = {4,99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 898); }
+
+    {   set_knight(&theKnight, 888, 3, 0, 0, 0); // Lancelot, odd number
+        int events[] = {4,99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 898); }
+
+    {   set_knight(&theKnight, 11, 8, 0, 0, 0);
+        int events[] = {4,99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 21); }
+
+    {   set_knight(&theKnight, 12, 10, 0, 0, 0);
+        int events[] = {99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 22); }
+
+    {   set_knight(&theKnight, 100, 9, 0, 0, 0);
+        int events[] = {99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
+}
+
+TEST_CASE("Test item") {
+    // EXCALIBUR - 11
+    {   set_knight(&theKnight, 172, 1, 2, 0, 0);
+        int events[] = {8,5};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 176); }
+
+    // MYTHRIL armor - 12
+    {   set_knight(&theKnight, 172, 1, 2, 0, 0);
+        int events[] = {9,5,8,4};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 176); }
+
+    // EXCALIPOOR - 13
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {8,9,10,5};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 178); }
+
+    // MUSHMARIO - 14
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {10,1,11};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 178); }
+
+    // MUSHFIB
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {10,1,11,12};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 178); }
+
+    // MUSHFGHOST
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {10,1,11,12,13};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 128); }
+
+    {   set_knight(&theKnight, 50, 0, 0, 0, 0);
+        int events[] = {13};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 1); }
+
+    // MUSHKNIGHT
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {10,1,14};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 228); }
+
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {10,1,14,15,16,17};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 231); }
 }
 
 /*

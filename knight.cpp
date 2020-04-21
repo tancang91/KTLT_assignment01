@@ -17,8 +17,8 @@ const int MAX_CHARACTER_EACH_LINE = 250;
 #define TEST_1920005
 
 #define RESULT(hp, level, remedy, maidenkiss, pheonixdown) (hp+level+remedy+maidenkiss+pheonixdown)
-#define MIN(a, b) (a<b?a:b)
-#define MAX(a, b) (a>b?a:b)
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 enum Opponent {
     MADBEAR_ = 1,
@@ -43,7 +43,10 @@ enum Item {
     MAINDENKISS,
     PHOENIXDOWN,
     LIGHTWING = 21,
-    DRAGONSWORD = 23
+    DRAGONSWORD = 23,
+
+    NORMALSWORD = 24,
+    NORMALARMOR = 25
 };
 
 enum Special {
@@ -85,6 +88,10 @@ struct knight
    int numCursed;
    Character character;
    Character trueCharacter;
+
+    // Item
+    Item sword;
+    Item armor;
 };
 
 
@@ -206,9 +213,90 @@ void display(int* nOut)
 
 
 // Function define
-void handle_item(struct knight *theKnight, Item item, int eventNum)
-{
 
+int get_fib(int N) {
+    if (N <= 1) return 2;
+
+    int a,b,next_fib;
+    a = 0; b = 1;
+
+    do { next_fib = a + b;
+        a = b;
+        b = next_fib;
+    } while(N >= next_fib);
+
+    return next_fib;
+};
+
+void handle_item(struct knight *theKnight, Item item)
+{
+    switch(item) {
+        case Item::EXCALIBUR: {
+            if (theKnight->trueCharacter != Character::DRAGONKNIGHT)
+                theKnight->sword = Item::EXCALIBUR;
+        } break;
+
+        case Item::MYTHRIL: {
+            theKnight->armor = Item::MYTHRIL;
+        } break;
+
+        case Item::EXCALIPOOR: {
+            bool isFool = (theKnight->level < 5) && 
+                    (theKnight->trueCharacter == Character::KNIGHT || 
+                        (theKnight->trueCharacter == Character::LANCELOT && !(theKnight->level & 1UL)));
+            if (isFool)
+                theKnight->sword = Item::EXCALIPOOR;
+        } break;
+
+        case Item::MUSHMARIO: {
+            theKnight->HP = MIN(theKnight->HP + 50, theKnight->maxHP);
+        } break;
+
+        case Item::MUSHFIB: {
+            int fib = get_fib(theKnight->HP);
+            theKnight->HP = MIN(fib, theKnight->maxHP);
+        } break;
+
+        case Item::MUSHGHOST: {
+            bool isSmart = (theKnight->trueCharacter == Character::PALADIN) ||
+                            (theKnight->trueCharacter == Character::DRAGONKNIGHT);
+            if (!isSmart)
+                theKnight->HP = MAX(1, theKnight->HP-50);
+        } break;
+
+        case Item::MUSHKNIGHT: {
+            theKnight->maxHP = MIN(999, theKnight->maxHP+50);
+            theKnight->HP = theKnight->maxHP;
+        } break;
+
+        case Item::REMEDY:
+            theKnight->remedy = MIN(99, theKnight->remedy + 1);
+            if (theKnight->character == Character::DWARF)
+            {
+                theKnight->character = theKnight->trueCharacter;
+                theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
+                theKnight->numCursed = 0;
+                theKnight->remedy--;
+            }
+            break;
+
+        case Item::MAINDENKISS: {
+            theKnight->maidenkiss = MIN(99, theKnight->maidenkiss + 1);
+            if (theKnight->character == Character::FROG)
+            {
+                theKnight->character = theKnight->trueCharacter;
+                theKnight->level = theKnight->previousLevel;
+                theKnight->numCursed = 0;
+                theKnight->maidenkiss--;
+            }
+        } break;
+
+        case Item::PHOENIXDOWN: {
+            theKnight->phoenixdown = MIN(99, theKnight->phoenixdown + 1);
+        } break;
+
+        default: break;
+    }
 }
 
 void handle_special(struct knight *theKnight, Special event, int eventNum)
@@ -223,70 +311,87 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
     int b = eventNum % 10;
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
 
-    bool autowin = (    (character == Character::ARTHUR)          ||
-                        (character == Character::DRAGONKNIGHT)    || 
+    bool autowin = (    (character == Character::ARTHUR)                    ||
+                        (character == Character::DRAGONKNIGHT)              || 
                         (character == Character::LANCELOT && (level & 1UL)) ||
                         (character == Character::PALADIN && (level >= 8) )  ||
+                        (character == Character::UNDRAGONKNIGHT && (level == 10)) ||
                         (character == Character::KNIGHT && (level == 10))
                     );
 
     if (opponent == Opponent::BOWSER) {
-        if (autowin)
+        if (autowin || (character == Character::LANCELOT))
             theKnight->level = 10;
         else
             Game = GameState::GAMEOVER;
         return;
     }
 
-    autowin = autowin || 
-        (character == Character::UNDRAGONKNIGHT &&  (level > level_oppnent)) ||
-        (character == Character::LANCELOT && !(level & 1UL) && (level > level_oppnent)) ||
-        (character == Character::KNIGHT && (level > level_oppnent));
+    bool isExcalipoor = (theKnight->sword == Item::EXCALIPOOR);
+    autowin = (    (character == Character::ARTHUR)                         ||
+                        (character == Character::DRAGONKNIGHT)              || 
+                        (character == Character::LANCELOT && (level & 1UL)) ||
+                        (character == Character::PALADIN)  ||
+                        (character == Character::UNDRAGONKNIGHT &&  (level > level_oppnent))   ||
+                        (character == Character::LANCELOT && !(level & 1UL) && (level > level_oppnent) && !isExcalipoor) ||
+                        (character == Character::KNIGHT && (level > level_oppnent) && !isExcalipoor)
+                    );
 
     switch (opponent) {
-        case Opponent::VAJSH: { // 7
-            if (autowin) {
-                theKnight->level = MIN(10, level + 2);
-            }
-            else if (character != Character::DWARF &&character != Character::FROG && level < level_oppnent) {
-                if (theKnight->maidenkiss > 0)
-                    theKnight->maidenkiss--;
-                else {
-                    theKnight->previousLevel = theKnight->level;
-                    theKnight->level = 1;
-                    theKnight->character = Character::FROG;
-                    theKnight->numCursed = 3;
+        case Opponent::VAJSH: // 7
+            if (autowin) { theKnight->level = MIN(10, level + 2); }
+            else if (character != Character::FROG && character != Character::DWARF)
+            {
+                if (isExcalipoor || level < level_oppnent)
+                {
+                    if (theKnight->maidenkiss > 0)
+                        theKnight->maidenkiss--;
+                    else 
+                    {
+                        theKnight->previousLevel = theKnight->level;
+                        theKnight->level = 1;
+                        theKnight->character = Character::FROG;
+                        theKnight->numCursed = 3;
+                    }
                 }
             }
-        } return;
+            return;
 
-        case Opponent::SHAMAN: { // 6
+        case Opponent::SHAMAN: // 6
             if (autowin) {theKnight->level = MIN(10, level + 2);}
-            else if (character != Character::DWARF && character != Character::FROG && level < level_oppnent) {
-                theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
-                if (theKnight->remedy > 0) {
-                    theKnight->remedy--;
-                    theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
-                }
-                else {
-                    theKnight->character = Character::DWARF;
-                    theKnight->numCursed = 3;
+            else if (character != Character::FROG && character != Character::DWARF)
+            {
+                if (isExcalipoor || level < level_oppnent)
+                {
+                    theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
+                    if (theKnight->remedy > 0)
+                    {
+                        theKnight->remedy--;
+                        theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
+                    }
+                    else
+                    {
+                        theKnight->character = Character::DWARF;
+                        theKnight->numCursed = 3;
+                    }
                 }
             }
-        } return;
+            return;
 
-        default: {
-            if (autowin)    {theKnight->level = MIN(10, level + 1);} 
-            else if (level < level_oppnent) {
-                float basedame = 1.0f;
-                if (opponent == Opponent::BANDIT_)          basedame = 1.5;
-                else if (opponent == Opponent::LORDLUPIN)   basedame = 4.5;
-                else if (opponent == Opponent::ELF)         basedame = 6.5;
-                else if (opponent == Opponent::TROLL)       basedame = 8.5;
+        default:
+            if (autowin || theKnight->sword == Item::EXCALIBUR) {theKnight->level = MIN(10, level + 1);} 
+            else if (isExcalipoor || level < level_oppnent) {
+                if (theKnight->armor != Item::MYTHRIL) {
+                    float basedame = 1.0f;
+                    if (opponent == Opponent::BANDIT_)          basedame = 1.5;
+                    else if (opponent == Opponent::LORDLUPIN)   basedame = 4.5;
+                    else if (opponent == Opponent::ELF)         basedame = 6.5;
+                    else if (opponent == Opponent::TROLL)       basedame = 8.5;
 
-                theKnight->HP = (int)(theKnight->HP - level_oppnent*basedame*10.0f);
+                    theKnight->HP = (int)(theKnight->HP - level_oppnent*basedame*10.0f);
+                }
             }
-        } break;
+            break;
     }
 
     // Check die
@@ -379,6 +484,8 @@ Character get_character(int orignalHP) {
 int game_main(struct knight *theKnight, int *events, int numEvents)
 {
     int nOut = -1;
+    theKnight->armor = Item::NORMALARMOR;
+    theKnight->sword = Item::NORMALSWORD;
     theKnight->maxHP = theKnight->HP;
     theKnight->trueCharacter = theKnight->character = get_character(theKnight->HP);
     Game = GameState::RUNNING;
@@ -393,7 +500,7 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
         if ((theEvent >= 1 && theEvent <= 7) || theEvent == 99)
             handle_fight(theKnight, (Opponent) theEvent,i+1);
         else if (theEvent >= 8 && theEvent <= 17)
-            handle_item(theKnight, (Item) theEvent, i+1);
+            handle_item(theKnight, (Item) theEvent);
         else if (theEvent >= 18 && theEvent <= 23)
             handle_special(theKnight, (Special) theEvent, i+1);
 
@@ -436,13 +543,12 @@ int main(int argc, char** argv)
 #endif
 
 /*
- *
  * int main()
  * {
  *
- *    struct knight theKnight = {.HP=998, .level=1, .remedy=0, .maidenkiss=0, .phoenixdown=0};
- *    int events[] = {4,6,1,1,1};
- *    game_main(&theKnight, events, 5);
+ *    struct knight theKnight = {.HP=172, .level=4, .remedy=2, .maidenkiss=0, .phoenixdown=0};
+ *    int events[] = {8,9,10,5};
+ *    game_main(&theKnight, events, sizeof(events)/sizeof(int));
  *    return 0;
  * }
  */

@@ -65,13 +65,13 @@ struct knight
 
 
 // Function define
-void handle_item(struct knight *theKnight, Item item, int eventNum);
+void handle_item(struct knight *theKnight, Item item);
 void handle_special(struct knight *theKnight, Special event, int eventNum);
 void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum);
 bool check_prime(int number);
 bool check_dragonknight(int number);
 Character get_character(int orignalHP);
 int game_main(struct knight *theKnight, int *events, int numEvents);
-
+int get_fib(int N);
 
 #endif /* end of include guard: KNIGHT_H_4UNFRJ8C */
