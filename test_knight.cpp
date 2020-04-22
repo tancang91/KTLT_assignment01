@@ -48,6 +48,11 @@ void set_knight(struct knight *theKnight, int HP, int level, int remedy, int mai
     theKnight->remedy = remedy;
     theKnight->maidenkiss = maidenkiss;
     theKnight->phoenixdown = phoenixdown;
+
+    theKnight->numCursed = 0;
+    theKnight->previousLevel = 0;
+    theKnight->sword = Item::NORMALSWORD; 
+    theKnight->armor = Item::NORMALARMOR; 
 }
 
 TEST_CASE("Check fight", "[handle_fight]") {
@@ -158,6 +163,45 @@ TEST_CASE("Test item") {
     {   set_knight(&theKnight, 172, 4, 2, 0, 0);
         int events[] = {10,1,14,15,16,17};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 231); }
+}
+
+TEST_CASE("Test Special") {
+    // GUINEVERE - 20
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {1,4,20,3,4,5,6,7,8,9,10,11};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 182); }
+    // LIGHTWING - event 21 - ex 17
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {21,4,18,3,2};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 103); }
+
+    // LIGHTWING - event 21 - ex 18
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {21,99,99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 178); }
+
+    // LIGHTWING - event 21 - ex 19
+    {   set_knight(&theKnight, 172, 4, 2, 0, 0);
+        int events[] = {21,99,20,99,16,20,12};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 178); }
+}
+
+TEST_CASE("Test Character")
+{
+    // Arthur - ex 20
+    {   set_knight(&theKnight, 999, 6, 2, 0, 0);
+        int events[] = {6,19};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 1009); }
+
+    // Arthur - ex 21
+    {   set_knight(&theKnight, 999, 6, 2, 0, 0);
+        int events[] = {19};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
+
+    // Lancelot - ex 22
+    {   set_knight(&theKnight, 888, 1, 2, 0, 0);
+        int events[] = {10,1,10,7,5};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 892); }
 }
 
 /*

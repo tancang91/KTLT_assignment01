@@ -23,8 +23,10 @@ enum Item {
     REMEDY,
     MAINDENKISS,
     PHOENIXDOWN,
-    LIGHTWING = 21,
-    DRAGONSWORD = 23
+    DRAGONSWORD = 23,
+
+    NORMALSWORD = 24,
+    NORMALARMOR = 25
 };
 
 enum Special {
@@ -61,8 +63,12 @@ struct knight
    int numCursed;
    Character character;
    Character trueCharacter;
-};
 
+    // Item
+    Item sword;
+    Item armor;
+    int odin;
+};
 
 // Function define
 void handle_item(struct knight *theKnight, Item item);
