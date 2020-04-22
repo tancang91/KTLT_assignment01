@@ -362,16 +362,17 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
 {
     int level = theKnight->level;
     Character character = theKnight->character;
+    Character trueCharacter = theKnight->trueCharacter;
     int b = eventNum % 10;
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
 
     bool autowin = (    (theKnight->odin > 0)                               ||
-                        (theKnight->trueCharacter == Character::ARTHUR)                    ||
-                        (theKnight->trueCharacter == Character::DRAGONKNIGHT)              || 
-                        (theKnight->trueCharacter == Character::LANCELOT && (level & 1UL)) ||
-                        (theKnight->trueCharacter == Character::PALADIN && (level >= 8) )  ||
-                        (character == Character::UNDRAGONKNIGHT && (level == 10)) ||
-                        (character == Character::KNIGHT && (level == 10))
+                        (trueCharacter == Character::ARTHUR)                    ||
+                        (trueCharacter == Character::DRAGONKNIGHT)              || 
+                        (trueCharacter == Character::LANCELOT && (level & 1UL)) ||
+                        (trueCharacter == Character::PALADIN && (level >= 8) )  ||
+                        (trueCharacter == Character::UNDRAGONKNIGHT && (level == 10)) ||
+                        (trueCharacter == Character::KNIGHT && (level == 10))
                     );
 
     if (opponent == Opponent::BOWSER) {
@@ -385,60 +386,64 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
     bool isExcalipoor = (theKnight->sword == Item::EXCALIPOOR);
 
     autowin = (         (theKnight->odin > 0)                               ||
-                        (theKnight->trueCharacter == Character::ARTHUR)                    ||
-                        (theKnight->trueCharacter == Character::DRAGONKNIGHT)              || 
-                        (theKnight->trueCharacter == Character::LANCELOT && (level & 1UL)) ||
-                        (theKnight->trueCharacter == Character::PALADIN)  ||
-                        (character == Character::UNDRAGONKNIGHT &&  (level > level_oppnent))   ||
-                        (character == Character::LANCELOT && !(level & 1UL) && (level > level_oppnent) && !isExcalipoor) ||
-                        (character == Character::KNIGHT && (level > level_oppnent) && !isExcalipoor)
+                        (trueCharacter == Character::ARTHUR)                    ||
+                        (trueCharacter == Character::DRAGONKNIGHT)              || 
+                        (trueCharacter == Character::LANCELOT && (level & 1UL)) ||
+                        (trueCharacter == Character::PALADIN)  ||
+                        (level > level_oppnent && !isExcalipoor)
                     );
 
     switch (opponent) {
         case Opponent::VAJSH: // 7
-            if (autowin) { theKnight->level = MIN(10, level + 2); }
-            else if (character != Character::FROG && character != Character::DWARF)
+            if (character == Character::FROG || character == Character::DWARF)
+                return;
+
+            if (autowin)
+                theKnight->level = MIN(10, level + 2);
+            else if (level < level_oppnent || isExcalipoor)
             {
-                if (isExcalipoor || level < level_oppnent)
+                if (theKnight->maidenkiss > 0)
+                    theKnight->maidenkiss--;
+                else 
                 {
-                    if (theKnight->maidenkiss > 0)
-                        theKnight->maidenkiss--;
-                    else 
-                    {
-                        theKnight->previousLevel = theKnight->level;
-                        theKnight->level = 1;
-                        theKnight->character = Character::FROG;
-                        theKnight->numCursed = 3;
-                    }
+                    theKnight->previousLevel = theKnight->level;
+                    theKnight->level = 1;
+                    theKnight->character = Character::FROG;
+                    theKnight->numCursed = 3;
                 }
             }
             return;
 
         case Opponent::SHAMAN: // 6
-            if (autowin) {theKnight->level = MIN(10, level + 2);}
-            else if (character != Character::FROG && character != Character::DWARF)
+            if (character == Character::FROG || character == Character::DWARF)
+                return;
+
+            if (autowin)
+                theKnight->level = MIN(10, level + 2);
+            else if (level < level_oppnent || isExcalipoor)
             {
-                if (isExcalipoor || level < level_oppnent)
+                theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
+                if (theKnight->remedy > 0)
                 {
-                    theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
-                    if (theKnight->remedy > 0)
-                    {
-                        theKnight->remedy--;
-                        theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
-                    }
-                    else
-                    {
-                        theKnight->character = Character::DWARF;
-                        theKnight->numCursed = 3;
-                    }
+                    theKnight->remedy--;
+                    theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
+                }
+                else
+                {
+                    theKnight->character = Character::DWARF;
+                    theKnight->numCursed = 3;
                 }
             }
             return;
 
         default:
-            if (autowin || theKnight->sword == Item::EXCALIBUR) {theKnight->level = MIN(10, level + 1);} 
-            else if (isExcalipoor || level < level_oppnent) {
-                if (theKnight->armor != Item::MYTHRIL) {
+            if (autowin || theKnight->sword == Item::EXCALIBUR) 
+                theKnight->level = MIN(10, level + 1);
+
+            else if (level < level_oppnent || isExcalipoor)
+            {
+                if (theKnight->armor != Item::MYTHRIL)
+                {
                     float basedame = 1.0f;
                     if (opponent == Opponent::BANDIT_)          basedame = 1.5;
                     else if (opponent == Opponent::LORDLUPIN)   basedame = 4.5;
