@@ -72,7 +72,7 @@ struct knight
 
 // Function define
 void handle_item(struct knight *theKnight, Item item);
-void handle_special(struct knight *theKnight, Special event, int eventNum);
+void handle_special(struct knight *theKnight, Special event);
 void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum);
 bool check_prime(int number);
 bool check_dragonknight(int number);

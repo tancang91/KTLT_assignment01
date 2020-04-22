@@ -74,18 +74,18 @@ enum GameState {
 
 struct knight
 {
-   int HP;
-   int level;
-   int remedy;
-   int maidenkiss;
-   int phoenixdown;
+    int HP;
+    int level;
+    int remedy;
+    int maidenkiss;
+    int phoenixdown;
 
-   int maxHP;
-   int previousHP;
-   int previousLevel;
-   int numCursed;
-   Character character;
-   Character trueCharacter;
+    int maxHP;
+    int previousHP;
+    int previousLevel;
+    int numCursed;
+    Character character;
+    Character trueCharacter;
 
     // Item
     Item sword;
@@ -211,7 +211,7 @@ void display(int* nOut)
 }
 
 
-// Function define
+/* Implementation */
 
 int get_fib(int N) {
     if (N <= 1) return 2;
@@ -312,7 +312,7 @@ void handle_item(struct knight *theKnight, Item item)
     }
 }
 
-void handle_special(struct knight *theKnight, Special event, int eventNum)
+void handle_special(struct knight *theKnight, Special event)
 {
     switch(event)
     {
@@ -343,6 +343,7 @@ void handle_special(struct knight *theKnight, Special event, int eventNum)
             break;
 
         //case Special::GUNIEVERE:
+            //theKnight->movement = -1;
             //break;
 
         case Special::ODIN: {
@@ -537,7 +538,6 @@ Character get_character(int orignalHP) {
 }
 
 
-// TODO: GUNIEVERE, event 20: go back to england
 int game_main(struct knight *theKnight, int *events, int numEvents)
 {
     int nOut = -1;
@@ -549,8 +549,8 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
     Game = GameState::RUNNING;
 
     int i;
-    int goDirection = 1;
-	for (i = 0; i >= 0 && i < numEvents; i+=goDirection)
+    int movement = 1;
+	for (i = 0; i >= 0 && i < numEvents; i+=movement)
     {
         if (Game != GameState::RUNNING) break;
         theKnight->numCursed -= (int) ((theKnight->numCursed & 0x01) || (theKnight->numCursed & 0x02));
@@ -565,27 +565,27 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
             handle_fight(theKnight, (Opponent) theEvent,i+1);
         else if ((theEvent >= 8 && theEvent <= 17 ) || theEvent == 23)
             handle_item(theKnight, (Item) theEvent);
-        else if (theEvent >= 18 && theEvent <= 22)
+        else if ((theEvent >= 18 && theEvent <= 22) || theEvent == 0)
         {
             // Event 20, go back to england
             if (theEvent == Special::GUNIEVERE)
-                goDirection = -1;
+                movement = -1;
 
             // LIGHTWING event 21
             else if (theEvent == Special::LIGHTWING)
             {
                 if (numEvents-1-i >= 4)
                 {
-                    if(goDirection == 1)
+                    if(movement == 1)
                         for (int j = 1; j <= 3; ++j) 
                             if (events[i+j] == Special::SURRENDER || events[i+j] == Special::GUNIEVERE)
                                 Game = GameState::FINISHED;
                 }
                 else Game = GameState::FINISHED;
-                i += 3*goDirection;
+                i += 3*movement;
             }
             else
-                handle_special(theKnight, (Special) theEvent, i+1);
+                handle_special(theKnight, (Special) theEvent);
         }
 
         // Check magic cursed (FROG, DWARF)

@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+//#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 #include "knight.h"
 
@@ -11,6 +11,7 @@ TEST_CASE( "Check Prime", "[check_prime]" ) {
     REQUIRE( check_prime(2) );
     REQUIRE( check_prime(3) );
 
+    REQUIRE_FALSE(check_prime(11));
     REQUIRE_FALSE(check_prime(-1));
     REQUIRE_FALSE(check_prime(0));
     REQUIRE_FALSE(check_prime(1));
@@ -25,9 +26,10 @@ TEST_CASE("Check dragon knight", "[check_dragonknight]") {
     REQUIRE(check_dragonknight(sum(7,24,25)));
     REQUIRE(check_dragonknight(sum(8,15,17)));
     REQUIRE(check_dragonknight(sum(30,40,50)));
-    REQUIRE(check_dragonknight(sum(21,28,35)));
+    REQUIRE(check_dragonknight(234));
 
     REQUIRE_FALSE(check_dragonknight(6));
+    REQUIRE_FALSE(check_dragonknight(8));
     REQUIRE_FALSE(check_dragonknight(111));
     REQUIRE_FALSE(check_dragonknight(1000));
     REQUIRE_FALSE(check_dragonknight(sum(9999,200,10001)));
@@ -55,32 +57,49 @@ void set_knight(struct knight *theKnight, int HP, int level, int remedy, int mai
     theKnight->armor = Item::NORMALARMOR; 
 }
 
-TEST_CASE("Check fight", "[handle_fight]") {
+TEST_CASE("Check fight", "[fight]") {
+
+    // Check Dwarf - event 0 - ex 3
+    {   set_knight(&theKnight, 172, 2, 0, 1, 0);
+        int events[] = {0};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 175); }
+
+    // Check Dwarf - event 0 - ex 3
+    {   set_knight(&theKnight, 172, 2, 0, 1, 0);
+        int events[] = {0,10,5,15,21,99};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 175); }
+
+    // Check Dwarf - event 1...5 - ex 4
     {   set_knight(&theKnight, 172, 2, 0, 1, 0);
         int events[1] = {5};
         REQUIRE(game_main(&theKnight, events, 1) == 176); }
 
+    // Check Dwarf - event 1...5 - ex 5
     {   set_knight(&theKnight, 172, 1, 0, 1, 0);
         int events[2] = {5,2};
         REQUIRE(game_main(&theKnight, events, 2) == 144); }
 
+    // Check Dwarf - event 1...5 - ex 6
     {   set_knight(&theKnight, 152, 1, 0, 1, 0);
         int events[3] = {3,5,7};
         REQUIRE(game_main(&theKnight, events, 3) == -1); }
 
+    // Check Dwarf - event 1...5 - ex 7
     {   set_knight(&theKnight, 152, 1, 0, 1, 1);
         int events[2] = {3,5};
         REQUIRE(game_main(&theKnight, events, 2) == 154); }
 
+    // Check Dwarf - event 6 - ex 8
     {   set_knight(&theKnight, 152, 1 , 0, 0, 0);
         int events[3] = {4,6,5};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
 
-    // Check Dwarf
+    // Check Dwarf - event 6 - ex 9
     {   set_knight(&theKnight, 998, 1 , 0, 0, 0);
         int events[] = {4,6,1,1,1};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 396); }
 
+    // Check Dwarf - event 6 - ex 10
     {   set_knight(&theKnight, 998, 1 , 2, 0, 0);
         int events[] = {4,6,1};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 967); }
@@ -121,17 +140,17 @@ TEST_CASE("Check fight", "[handle_fight]") {
 }
 
 TEST_CASE("Test item") {
-    // EXCALIBUR - 11
+    // EXCALIBUR - event 8 - ex 11
     {   set_knight(&theKnight, 172, 1, 2, 0, 0);
         int events[] = {8,5};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 176); }
 
-    // MYTHRIL armor - 12
+    // MYTHRIL armor - event 9 - ex 12
     {   set_knight(&theKnight, 172, 1, 2, 0, 0);
         int events[] = {9,5,8,4};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 176); }
 
-    // EXCALIPOOR - 13
+    // EXCALIPOOR - event 10 - ex 13
     {   set_knight(&theKnight, 172, 4, 2, 0, 0);
         int events[] = {8,9,10,5};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 178); }
@@ -155,7 +174,7 @@ TEST_CASE("Test item") {
         int events[] = {13};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 1); }
 
-    // MUSHKNIGHT
+    // MUSHKNIGHT - event 14 - ex 15
     {   set_knight(&theKnight, 172, 4, 2, 0, 0);
         int events[] = {10,1,14};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 228); }
@@ -166,7 +185,7 @@ TEST_CASE("Test item") {
 }
 
 TEST_CASE("Test Special") {
-    // GUINEVERE - 20
+    // GUINEVERE - event 20 - ex 16
     {   set_knight(&theKnight, 172, 4, 2, 0, 0);
         int events[] = {1,4,20,3,4,5,6,7,8,9,10,11};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 182); }
@@ -186,7 +205,7 @@ TEST_CASE("Test Special") {
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 178); }
 }
 
-TEST_CASE("Test Character")
+TEST_CASE("Test Character", "[character]")
 {
     // Arthur - ex 20
     {   set_knight(&theKnight, 999, 6, 2, 0, 0);
@@ -202,6 +221,49 @@ TEST_CASE("Test Character")
     {   set_knight(&theKnight, 888, 1, 2, 0, 0);
         int events[] = {10,1,10,7,5};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 892); }
+}
+
+TEST_CASE("Test Abyss vuc tham","[abyss][character]") {
+    // event 19
+    {   set_knight(&theKnight, 9, 7, 2, 0, 0);
+        int events[] = {19};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 18); }
+
+    {   set_knight(&theKnight, 999, 1, 10, 10, 10);
+        int events[] = {99, 19};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 1039); }
+
+    SECTION("King Arthur")
+    {
+        {   set_knight(&theKnight, 999, 6, 2, 0, 0);
+            int events[] = {19};
+            REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
+    }
+
+    SECTION("Dragon")
+    {
+        {   set_knight(&theKnight, 12, 6, 2, 0, 0);
+            int events[] = {19};
+            REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
+
+        {   set_knight(&theKnight, 12, 6, 2, 0, 0);
+            int events[] = {23, 19};
+            REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 20); }
+    }
+
+    SECTION("Paladin")
+    {
+        set_knight(&theKnight, 41, 6, 2, 0, 0);
+        int events[] = {19};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1);
+    }
+
+    SECTION("Lancelot")
+    {
+        set_knight(&theKnight, 888, 5, 2, 0, 0);
+        int events[] = {19};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1);
+    }
 }
 
 /*
