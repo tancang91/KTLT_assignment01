@@ -295,15 +295,8 @@ void handle_item(struct knight *theKnight, Item item)
         case Item::DRAGONSWORD:
             if (theKnight->trueCharacter == Character::UNDRAGONKNIGHT)
             {
-                if (theKnight->character == Character::FROG)
-                    theKnight->level = theKnight->previousLevel;
-                else if (theKnight->character == Character::DWARF)
-                    theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
-
                 theKnight->sword = Item::DRAGONSWORD;
-                theKnight->character = Character::DRAGONKNIGHT;
                 theKnight->trueCharacter = Character::DRAGONKNIGHT;
-                theKnight->numCursed = 0;
             }
 
         default: break;
@@ -333,10 +326,10 @@ void handle_special(struct knight *theKnight, Special event)
             theKnight->HP = theKnight->maxHP;
             break;
 
-        // Gameover, except the knight is DRAGONKNIGHT or theKnight.level >= 1
+        // Gameover, except the knight is DRAGONKNIGHT or theKnight.level >= 7
         case Special::ABYSS:
             if (theKnight->level < 7)
-                if (theKnight->character != Character::DRAGONKNIGHT)
+                if (theKnight->trueCharacter != Character::DRAGONKNIGHT)
                     Game = GameState::GAMEOVER;
             break;
 
