@@ -338,10 +338,14 @@ void handle_special(struct knight *theKnight, Special event)
             //break;
 
         case Special::ODIN: {
+            // Odin = -1, the knight does not meet odin before
             // Odin help 3 times, but in order to maintaince the logic flow of game_main correct
             // I add 1
-            int odin = 3;
-            theKnight->odin = odin + 1;
+            if (theKnight->odin == -1)
+            {
+                int odin = 3;
+                theKnight->odin = odin + 1;
+            }
         } break;
 
         default: break;
@@ -535,7 +539,7 @@ Character get_character(int orignalHP) {
 int game_main(struct knight *theKnight, int *events, int numEvents)
 {
     int nOut = -1;
-    theKnight->odin = 0;
+    theKnight->odin = -1;
     theKnight->armor = Item::NORMALARMOR;
     theKnight->sword = Item::NORMALSWORD;
     theKnight->maxHP = theKnight->HP;
