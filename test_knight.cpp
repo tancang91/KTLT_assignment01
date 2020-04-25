@@ -130,6 +130,7 @@ TEST_CASE("Example", "[example]")
     {   set_knight(&theKnight, 172, 4, 2, 0, 0);
         int events[] = {1,4,20,3,4,5,6,7,8,9,10,11};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 182); }
+
     // LIGHTWING - event 21 - ex 17
     {   set_knight(&theKnight, 172, 4, 2, 0, 0);
         int events[] = {21,4,18,3,2};

@@ -5,8 +5,6 @@
 
 using namespace std;
 
-const int MADBEAR = 1;
-const int BANDIT = 2;
 const int EVENT_SIZE = 100;
 const int MAX_CHARACTER_EACH_LINE = 250;
 
@@ -366,24 +364,22 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
     int b = eventNum % 10;
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
 
+    bool isExcalipoor = (theKnight->sword == Item::EXCALIPOOR);
     bool autowin = (    (theKnight->odin > 0)                               ||
                         (trueCharacter == Character::ARTHUR)                    ||
                         (trueCharacter == Character::DRAGONKNIGHT)              || 
-                        (trueCharacter == Character::LANCELOT && (level & 1UL)) ||
+                        (trueCharacter == Character::LANCELOT)                  ||
                         (trueCharacter == Character::PALADIN && (level >= 8) )  ||
-                        (trueCharacter == Character::UNDRAGONKNIGHT && (level == 10)) ||
-                        (trueCharacter == Character::KNIGHT && (level == 10))
+                        (level == 10 && !isExcalipoor)
                     );
 
     if (opponent == Opponent::BOWSER) {
-        if (autowin || (character == Character::LANCELOT))
+        if (autowin)
             theKnight->level = 10;
         else
             Game = GameState::GAMEOVER;
         return;
     }
-
-    bool isExcalipoor = (theKnight->sword == Item::EXCALIPOOR);
 
     autowin = (         (theKnight->odin > 0)                               ||
                         (trueCharacter == Character::ARTHUR)                    ||
@@ -555,7 +551,8 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
 
     int i;
     int movement = 1;
-	for (i = 0; i >= 0 && i < numEvents; i+=movement)
+    int round = 1;
+	for (i = 0; i >= 0 && i < numEvents; i+=movement, round++)
     {
         if (Game != GameState::RUNNING) break;
         theKnight->numCursed -= (int) ((theKnight->numCursed & 0x01) || (theKnight->numCursed & 0x02));
@@ -567,7 +564,7 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
         // 3. Special event
         int theEvent = events[i];
         if ((theEvent >= 1 && theEvent <= 7) || theEvent == 99)
-            handle_fight(theKnight, (Opponent) theEvent,i+1);
+            handle_fight(theKnight, (Opponent) theEvent,round);
         else if ((theEvent >= 8 && theEvent <= 17 ) || theEvent == 23)
             handle_item(theKnight, (Item) theEvent);
         else if ((theEvent >= 18 && theEvent <= 22) || theEvent == 0)
@@ -587,7 +584,7 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
                                 Game = GameState::FINISHED;
                 }
                 else Game = GameState::FINISHED;
-                i += 3*movement;
+                i += 3*movement; round += 3;
             }
             else
                 handle_special(theKnight, (Special) theEvent);
