@@ -242,6 +242,19 @@ TEST_CASE("Test Abyss vuc tham","[abyss][character]") {
         int events[] = {99, 19};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 1039); }
 
+    SECTION("Odin help")
+    {
+        // Odin -> Abyss -> MushGhost -> EXCALIPOOR
+        {   set_knight(&theKnight, 81, 4, 0, 0, 0);
+            int events[] = {22, 19, 13, 10};
+            REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 85); }
+
+        // Odin ->  EXCALIPOOR -> Troll
+        {   set_knight(&theKnight, 81, 0, 0, 0, 0);
+            int events[] = {22, 10, 5};
+            REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 82); }
+    }
+
     SECTION("King Arthur")
     {
         {   set_knight(&theKnight, 999, 6, 2, 0, 0);

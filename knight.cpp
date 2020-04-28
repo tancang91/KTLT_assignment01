@@ -241,7 +241,9 @@ void handle_item(struct knight *theKnight, Item item)
             bool isFool = (theKnight->level < 5) && 
                     (theKnight->trueCharacter == Character::KNIGHT || 
                         (theKnight->trueCharacter == Character::LANCELOT && !(theKnight->level & 1UL)));
-            if (isFool)
+
+            // Isfool and odin does not appear to help
+            if (isFool && (theKnight->odin <= 0))
                 theKnight->sword = Item::EXCALIPOOR;
         } break;
 
@@ -329,11 +331,12 @@ void handle_special(struct knight *theKnight, Special event)
             break;
 
         // Gameover, except the knight is DRAGONKNIGHT or theKnight.level >= 7
-        case Special::ABYSS:
-            if (theKnight->level < 7)
+        case Special::ABYSS: {
+            bool isOdin = theKnight->odin > 0;
+            if ( (theKnight->level < 7) && (!isOdin) )
                 if (theKnight->trueCharacter != Character::DRAGONKNIGHT)
                     Game = GameState::GAMEOVER;
-            break;
+         } break;
 
         //case Special::GUNIEVERE:
             //theKnight->movement = -1;
