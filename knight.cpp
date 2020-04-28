@@ -256,7 +256,9 @@ void handle_item(struct knight *theKnight, Item item)
 
         case Item::MUSHGHOST: {
             bool isSmart = (theKnight->trueCharacter == Character::PALADIN) ||
-                            (theKnight->trueCharacter == Character::DRAGONKNIGHT);
+                            (theKnight->trueCharacter == Character::DRAGONKNIGHT) ||
+                            (theKnight->odin > 0) ||
+                            (theKnight->armor == Item::MYTHRIL);
             if (!isSmart)
                 theKnight->HP = MAX(1, theKnight->HP-50);
         } break;

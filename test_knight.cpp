@@ -225,6 +225,11 @@ TEST_CASE("Test item", "[item]") {
     {   set_knight(&theKnight, 50, 0, 0, 0, 0);
         int events[] = {13};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 1); }
+
+    // MUSHFGHOST (event 9) and Mysthril (event 13)
+    {   set_knight(&theKnight, 100, 1, 0, 0, 0);
+        int events[] = {9,13};
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 101); }
 }
 
 TEST_CASE("Test Abyss vuc tham","[abyss][character]") {
