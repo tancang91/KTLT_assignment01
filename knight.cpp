@@ -17,27 +17,27 @@ const int MAX_CHARACTER_EACH_LINE = 250;
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 enum Opponent {
-    MADBEAR_ = 1,
-    BANDIT_,
-    LORDLUPIN,
-    ELF,
-    TROLL,
-    SHAMAN,
-    VAJSH,
-    BOWSER = 99
+    MADBEAR_    = 1,
+    BANDIT_     = 2,
+    LORDLUPIN   = 3,
+    ELF         = 4,
+    TROLL       = 5,
+    SHAMAN      = 6,
+    VAJSH       = 7,
+    BOWSER      = 99
 };
 
 enum Item {
-    EXCALIBUR = 8,
-    MYTHRIL,
-    EXCALIPOOR,
-    MUSHMARIO,
-    MUSHFIB,
-    MUSHGHOST,
-    MUSHKNIGHT,
-    REMEDY,
-    MAINDENKISS,
-    PHOENIXDOWN,
+    EXCALIBUR   = 8,
+    MYTHRIL     = 9,
+    EXCALIPOOR  = 10,
+    MUSHMARIO   = 11,
+    MUSHFIB     = 12,
+    MUSHGHOST   = 13,
+    MUSHKNIGHT  = 14,
+    REMEDY      = 15,
+    MAINDENKISS = 16,
+    PHOENIXDOWN = 17,
     DRAGONSWORD = 23,
 
     NORMALSWORD = 24,
@@ -45,12 +45,12 @@ enum Item {
 };
 
 enum Special {
-    SURRENDER = 0,
-    MERLIN = 18,
-    ABYSS = 19,
-    GUNIEVERE = 20,
-    LIGHTWING = 21,
-    ODIN = 22
+    SURRENDER   = 0,
+    MERLIN      = 18,
+    ABYSS       = 19,
+    GUNIEVERE   = 20,
+    LIGHTWING   = 21,
+    ODIN        = 22
 };
 
 enum Character {
@@ -575,18 +575,25 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
             if (theEvent == Special::GUNIEVERE)
                 movement = -1;
 
+            // TODO:
             // LIGHTWING event 21
+            // if encounter LIGHTWING when go back to england (movement = -1) then finished game.
             else if (theEvent == Special::LIGHTWING)
             {
-                if (numEvents-1-i >= 4)
+                if (movement == 1)
                 {
-                    if(movement == 1)
-                        for (int j = 1; j <= 3; ++j) 
-                            if (events[i+j] == Special::SURRENDER || events[i+j] == Special::GUNIEVERE)
-                                Game = GameState::FINISHED;
+                    if (numEvents-1-i >= 4)
+                    {
+                        if(movement == 1)
+                            for (int j = 1; j <= 3; ++j) 
+                                if (events[i+j] == Special::SURRENDER || events[i+j] == Special::GUNIEVERE)
+                                    Game = GameState::FINISHED;
+                    }
+                    else Game = GameState::FINISHED;
+                    i += 3*movement; round += 3;
                 }
-                else Game = GameState::FINISHED;
-                i += 3*movement; round += 3;
+                else if (movement == -1)
+                    Game = GameState::FINISHED;
             }
             else
                 handle_special(theKnight, (Special) theEvent);
