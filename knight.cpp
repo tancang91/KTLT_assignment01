@@ -370,7 +370,7 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
     bool autowin = (    (theKnight->odin > 0)                               ||
                         (trueCharacter == Character::ARTHUR)                    ||
                         (trueCharacter == Character::DRAGONKNIGHT)              || 
-                        (trueCharacter == Character::LANCELOT)                  ||
+                        (trueCharacter == Character::LANCELOT && (!isExcalipoor)) ||
                         (trueCharacter == Character::PALADIN && (level >= 8) )  ||
                         (level == 10 && !isExcalipoor)
                     );
@@ -386,8 +386,8 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
     autowin = (         (theKnight->odin > 0)                               ||
                         (trueCharacter == Character::ARTHUR)                    ||
                         (trueCharacter == Character::DRAGONKNIGHT)              || 
-                        (trueCharacter == Character::LANCELOT && (level & 1UL)) ||
                         (trueCharacter == Character::PALADIN)  ||
+                        (trueCharacter == Character::LANCELOT && (level & 1UL) && (!isExcalipoor)) ||
                         (level > level_oppnent && !isExcalipoor)
                     );
 
