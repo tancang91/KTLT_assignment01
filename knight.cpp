@@ -420,7 +420,9 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
                 theKnight->level = MIN(10, level + 2);
             else if (level < level_oppnent || isExcalipoor)
             {
-                theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
+                if (theKnight->armor != Item::MYTHRIL)
+                    theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
+
                 if (theKnight->remedy > 0)
                 {
                     theKnight->remedy--;

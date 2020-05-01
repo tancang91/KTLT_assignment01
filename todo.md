@@ -18,7 +18,7 @@
 
 ### Version 1.5
 
-    - [ ] Fix 0: Mysthril armor help when fight with shaman (HP unchange).
+    - [X] Fix 0: Mysthril armor help when fight with shaman (HP unchange).
 
     - [X] Fix 1: Knight, un-dragonknight hold Excalipoor always lose
     - [ ] Fix 2: Lightwing event will cancel out all of odin help.
