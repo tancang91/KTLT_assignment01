@@ -159,7 +159,7 @@ TEST_CASE("Example", "[example]")
     // Lancelot - ex 22
     {   set_knight(&theKnight, 888, 1, 2, 0, 0);
         int events[] = {10,1,10,7,5};
-        REQUIRE_FALSE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 892); }
+        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 892); }
 
     // ex 23
     CHECK(check_dragonknight(234));
