@@ -5,16 +5,15 @@
 
 using namespace std;
 
-const int EVENT_SIZE = 100;
-const int MAX_CHARACTER_EACH_LINE = 250;
-
-// -- Code section
-
+// *********Begin Enum type********** //
 #define TEST_1920005
 
 #define RESULT(hp, level, remedy, maidenkiss, pheonixdown) (hp+level+remedy+maidenkiss+pheonixdown)
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+const int EVENT_SIZE = 100;
+const int MAX_CHARACTER_EACH_LINE = 250;
 
 enum Opponent {
     MADBEAR_    = 1,
@@ -91,6 +90,7 @@ struct knight
     int odin;
 };
 
+// *********End Enum type********** //
 
 // read data from input file to corresponding variables
 // return 1 if successfully done, otherwise return 0
@@ -209,8 +209,7 @@ void display(int* nOut)
 }
 
 
-/* Implementation */
-
+// *********Begin Implementation********** //
 int get_fib(int N) {
     if (N <= 1) return 2;
 
@@ -623,6 +622,8 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
     return nOut;
 };
 
+// *********End Implementation********** //
+
 #ifndef TEST_1920005
 int main(int argc, char** argv)
 {
@@ -636,9 +637,10 @@ int main(int argc, char** argv)
     int i;
 
 	readFile(filename, theKnight, nEvent, arrEvent);
-	//cout << theKnight.HP << ' ' << theKnight.level << ' ' << theKnight.remedy << ' ' << theKnight.maidenkiss << ' ' << theKnight.phoenixdown << endl;
+    //cout << theKnight.HP << ' ' << theKnight.level << ' ' << theKnight.remedy << ' ' << theKnight.maidenkiss << ' ' << theKnight.phoenixdown << endl;
 
-    // TODO: Enter event loop
+    // Enter event loop
+    nOut = new int;
     *nOut = game_main(&theKnight, arrEvent, nEvent);
     display(nOut);
     return 0;
