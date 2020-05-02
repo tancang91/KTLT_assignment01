@@ -244,6 +244,22 @@ TEST_CASE("Test item", "[item]") {
         {   set_knight(&theKnight, 81, 0, 0, 0, 10);
             int events[] = {22, 21, 99, 99, 99, 99};
             CHECK(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
+
+        // Number of Frog & Dwarf remained even with lightwing event.
+        // DRAGONKNIGHT -> DRAGONKNIGHT -> VAJSH -> LIGHTWING -> Bowser
+        {   set_knight(&theKnight, 81, 2, 0, 0, 0);
+            int events[] = {23, 23, 7, 21, 99};
+            CHECK(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 82);
+            REQUIRE(theKnight.character == Character::FROG);
+            REQUIRE_FALSE(theKnight.numCursed == 0);
+        }
+        // DRAGONKNIGHT -> DRAGONKNIGHT -> SHAMAN -> LIGHTWING -> Bowser
+        {   set_knight(&theKnight, 81, 2, 0, 0, 0);
+            int events[] = {23, 23, 6, 21, 99};
+            CHECK(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 18);
+            REQUIRE(theKnight.character == Character::DWARF);
+            REQUIRE_FALSE(theKnight.numCursed == 0);
+        }
     }
 }
 

@@ -26,5 +26,5 @@
     - [X] Fix 4: Arthur always win, lacelot act like arthur always win.
     - [X] Fix 5: Shaman & vajsh ignore dwarf and frog even with odin helps.
     - [X] Fix 6: Game over immediately with Abyss and Bowser event.
-    - [ ] Fix 7: Frog & Dwarf remained even with lightwing event.
+    - [X] Fix 7: Frog & Dwarf remained even with lightwing event.
 
