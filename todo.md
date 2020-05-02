@@ -21,7 +21,7 @@
     - [X] Fix 0: Mysthril armor help when fight with shaman (HP unchange).
 
     - [X] Fix 1: Knight, un-dragonknight hold Excalipoor always lose
-    - [ ] Fix 2: Lightwing event will cancel out all of odin help.
+    - [X] Fix 2: Lightwing event will cancel out all of odin help.
     - [X] Fix 3: movement = -1 and collect lightwing then win game.
     - [X] Fix 4: Arthur always win, lacelot act like arthur always win.
     - [X] Fix 5: Shaman & vajsh ignore dwarf and frog even with odin helps.

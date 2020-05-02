@@ -230,6 +230,21 @@ TEST_CASE("Test item", "[item]") {
     {   set_knight(&theKnight, 100, 1, 0, 0, 0);
         int events[] = {9,13};
         REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 101); }
+
+    SECTION("LIGHTWING")
+    {
+        // Lightwing (event 21) help pass next 3 round.
+        // LIGHTWING -> BOWSER -> BOWSER -> BOWSER
+        {   set_knight(&theKnight, 100, 1, 0, 0, 0);
+            int events[] = {21, 99, 99, 99};
+            REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 101); }
+
+        // Number of odin help lost when the Knight find lightwing
+        // Odin ->  LIGHTWING -> Bowser -> Bowser -> Bowser -> Bowser
+        {   set_knight(&theKnight, 81, 0, 0, 0, 10);
+            int events[] = {22, 21, 99, 99, 99, 99};
+            CHECK(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
+    }
 }
 
 TEST_CASE("Test Abyss vuc tham","[abyss][character]") {
@@ -253,6 +268,13 @@ TEST_CASE("Test Abyss vuc tham","[abyss][character]") {
         {   set_knight(&theKnight, 81, 0, 0, 0, 0);
             int events[] = {22, 10, 5};
             REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 82); }
+
+        // Odin only help next 3 round.
+        // Odin ->  DRAGONSWORD -> DRAGONSWORD -> DRAGONSWORD -> Abyss
+        {   set_knight(&theKnight, 81, 0, 0, 0, 10);
+            int events[] = {22, 23, 23, 23, 19};
+            CHECK_FALSE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 91);
+            REQUIRE(theKnight.odin == 0); }
     }
 
     SECTION("King Arthur")

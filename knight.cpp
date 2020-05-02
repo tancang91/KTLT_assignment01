@@ -577,7 +577,6 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
             if (theEvent == Special::GUNIEVERE)
                 movement = -1;
 
-            // TODO:
             // LIGHTWING event 21
             // if encounter LIGHTWING when go back to england (movement = -1) then finished game.
             else if (theEvent == Special::LIGHTWING)
@@ -596,6 +595,10 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
                 }
                 else if (movement == -1)
                     Game = GameState::FINISHED;
+
+                // Lightwing event will cancel out all of odin help.
+                // So, it reasonable to set number of odin help to 0.
+                theKnight->odin = 0;
             }
             else
                 handle_special(theKnight, (Special) theEvent);
