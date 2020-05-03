@@ -210,6 +210,21 @@ void display(int* nOut)
 
 
 // *********Begin Implementation********** //
+
+void frog_to_normal(struct knight *theKnight)
+{
+    theKnight->character = theKnight->trueCharacter;
+    theKnight->level = theKnight->previousLevel;
+    theKnight->numCursed = 0;
+}
+
+void dwarf_to_normal(struct knight *theKnight)
+{
+    theKnight->character = theKnight->trueCharacter;
+    theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
+    theKnight->numCursed = 0;
+}
+
 int get_fib(int N) {
     if (N <= 1) return 2;
 
@@ -273,9 +288,7 @@ void handle_item(struct knight *theKnight, Item item)
             theKnight->remedy = MIN(99, theKnight->remedy + 1);
             if (theKnight->character == Character::DWARF)
             {
-                theKnight->character = theKnight->trueCharacter;
-                theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
-                theKnight->numCursed = 0;
+                dwarf_to_normal(theKnight);
                 theKnight->remedy--;
             }
             break;
@@ -284,9 +297,7 @@ void handle_item(struct knight *theKnight, Item item)
             theKnight->maidenkiss = MIN(99, theKnight->maidenkiss + 1);
             if (theKnight->character == Character::FROG)
             {
-                theKnight->character = theKnight->trueCharacter;
-                theKnight->level = theKnight->previousLevel;
-                theKnight->numCursed = 0;
+                frog_to_normal(theKnight);
                 theKnight->maidenkiss--;
             }
         } break;
@@ -317,11 +328,9 @@ void handle_special(struct knight *theKnight, Special event)
         case Special::MERLIN:
             // back to normal from Frog and Dwarf
             if (theKnight->character == Character::DWARF)
-                theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
+                dwarf_to_normal(theKnight);
             else if (theKnight->character == Character::FROG)
-                theKnight->level = theKnight->previousLevel;
-            theKnight->numCursed = 0;
-            theKnight->character = theKnight->trueCharacter;
+                frog_to_normal(theKnight);
 
             // increase level by 1
             theKnight->level = MIN(10, theKnight->level+1);
@@ -399,14 +408,15 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
                 theKnight->level = MIN(10, level + 2);
             else if (level < level_oppnent || isExcalipoor)
             {
+                theKnight->character = Character::FROG;
+                theKnight->previousLevel = theKnight->level;
+                theKnight->level = 1;
+                theKnight->numCursed = 3;
+
                 if (theKnight->maidenkiss > 0)
-                    theKnight->maidenkiss--;
-                else 
                 {
-                    theKnight->previousLevel = theKnight->level;
-                    theKnight->level = 1;
-                    theKnight->character = Character::FROG;
-                    theKnight->numCursed = 3;
+                    frog_to_normal(theKnight);
+                    theKnight->maidenkiss--;
                 }
             }
             return;
@@ -421,16 +431,13 @@ void handle_fight(struct knight *theKnight, Opponent opponent, int eventNum)
             {
                 if (theKnight->armor != Item::MYTHRIL)
                     theKnight->HP = MAX(1, (int)(theKnight->HP/5) );
+                theKnight->character = Character::DWARF;
+                theKnight->numCursed = 3;
 
                 if (theKnight->remedy > 0)
                 {
+                    dwarf_to_normal(theKnight);
                     theKnight->remedy--;
-                    theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
-                }
-                else
-                {
-                    theKnight->character = Character::DWARF;
-                    theKnight->numCursed = 3;
                 }
             }
             return;
@@ -605,15 +612,9 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
 
         // Check magic cursed (FROG, DWARF)
         if (theKnight->character == Character::FROG && theKnight->numCursed == 0)
-        {
-            theKnight->level = theKnight->previousLevel;
-            theKnight->character = theKnight->trueCharacter;
-        }
+            frog_to_normal(theKnight);
         else if (theKnight->character == Character::DWARF && theKnight->numCursed == 0)
-        {
-            theKnight->HP = MIN(theKnight->maxHP, 5*theKnight->HP);
-            theKnight->character = theKnight->trueCharacter;
-        }
+            dwarf_to_normal(theKnight);
     }
     //if (Game != GameState::GAMEOVER && i == numEvents)
     if (Game != GameState::GAMEOVER)
