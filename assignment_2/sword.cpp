@@ -32,7 +32,7 @@ enum Character
 
 struct ExKnight
 {
-    struct knight *oriKnight;
+    int HP; int gil; int level; int antidote;
 
     int maxHP;
     int odin;
@@ -117,9 +117,7 @@ Character get_character(int orignalHP)
 
 void handle_fight(struct ExKnight *theKnight, Event opponent, int eventNum)
 {
-    struct knight *oriKnight = theKnight->oriKnight;
-
-    int level = oriKnight->level;
+    int level = theKnight->level;
     Character character = theKnight->character;
     int b = eventNum % 10;
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
@@ -159,12 +157,12 @@ void handle_fight(struct ExKnight *theKnight, Event opponent, int eventNum)
             }
 
             if (autowin)
-                oriKnight->gil = MIN(999, oriKnight->gil + gil);
+                theKnight->gil = MIN(999, theKnight->gil + gil);
             else if (level < level_oppnent)
             {
                 if (!theKnight->isMythril)
-                    oriKnight->HP = 
-                        (int)(oriKnight->HP - level_oppnent*basedame*10.0f);
+                    theKnight->HP =
+                        (int)(theKnight->HP - level_oppnent*basedame*10.0f);
             }
         } break;
     }
@@ -172,8 +170,48 @@ void handle_fight(struct ExKnight *theKnight, Event opponent, int eventNum)
     // TODO: Check die, Call Phoenix
 }
 
-report*  game_main (knight& theKnight, castle arrCastle[], int nCastle, int mode, int nPetal)
+
+void init_knight(ExKnight* exKnight ,knight& oriKnight)
 {
+    exKnight->HP = oriKnight.HP;
+    exKnight->level = oriKnight.level;
+    exKnight->antidote = oriKnight.antidote;
+    exKnight->gil = oriKnight.gil;
+
+    exKnight->maxHP = oriKnight.HP;
+    exKnight->odin = -1;
+    exKnight->lionHeart = 0;
+    exKnight->isMythril = false;
+    exKnight->isPaladinW = exKnight->isLancelotW = exKnight->isGuinevere = false;
+    exKnight->isExcalibur = false;
+
+    Character character = get_character(oriKnight.HP);
+    exKnight->character = character;
+
+    switch(character)
+    {
+        case Character::LANCELOT:
+            exKnight->isLancelotW = true;
+            break;
+
+        case Character::PALADIN:
+            exKnight->isPaladinW = true;
+            break;
+
+        case Character::GUINEVERE:
+            exKnight->isGuinevere = true;
+            break;
+
+        default:
+            break;
+    }
+}
+
+report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode, int nPetal)
+{
+    ExKnight theKnight;
+    init_knight(&theKnight, oriKnight);
+
     int petal_count, win_count, lose_count;
     petal_count = win_count = lose_count = 0;
 
@@ -187,6 +225,11 @@ report*  game_main (knight& theKnight, castle arrCastle[], int nCastle, int mode
 
         }
     }
+
+    oriKnight.HP = theKnight.HP;
+    oriKnight.antidote = theKnight.antidote;
+    oriKnight.gil = theKnight.gil;
+    oriKnight.level = theKnight.level;
 
     return NULL;
 }

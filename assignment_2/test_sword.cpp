@@ -5,6 +5,7 @@
 
 #define sum(a,b,c) (a+b+c)
 
+// {{{ Check prime
 TEST_CASE( "Check Prime", "[check_prime]" ) {
     REQUIRE( check_prime(11) );
     REQUIRE( check_prime(41) );
@@ -17,7 +18,8 @@ TEST_CASE( "Check Prime", "[check_prime]" ) {
     REQUIRE_FALSE( check_prime(25) );
     REQUIRE_FALSE( check_prime(14) );
 }
-
+// }}}
+// {{{ Check Dragon Knight
 TEST_CASE("Check dragon knight", "[check_dragonknight]") {
     REQUIRE(check_dragonknight(sum(3,4,5)));
     REQUIRE(check_dragonknight(sum(5,12,13)));
@@ -32,6 +34,7 @@ TEST_CASE("Check dragon knight", "[check_dragonknight]") {
     REQUIRE_FALSE(check_dragonknight(1000));
     REQUIRE_FALSE(check_dragonknight(sum(9999,200,10001)));
 }
+// }}}
 
 /*
  *struct knight theKnight;
