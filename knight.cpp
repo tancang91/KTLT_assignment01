@@ -631,7 +631,7 @@ int game_main(struct knight *theKnight, int *events, int numEvents)
 int main(int argc, char** argv)
 {
     if (argc < 2) return 1;
-    const char* filename = argv[1];;
+    const char* filename = argv[1];
 
     struct knight theKnight;
     int nEvent; //number of events
