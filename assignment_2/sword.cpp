@@ -25,11 +25,7 @@ enum Event
     ULTIMECIA = 99
 };
 
-enum Character
-{
-    ARTHUR = 0, LANCELOT = 1, PALADIN = 2, UNDRAGONKNIGHT = 3,
-    DRAGONKNIGHT = 4, GUINEVERE = 5, KNIGHT = 6
-};
+enum Character { ARTHUR = 0, LANCELOT, PALADIN, DRAGONKNIGHT, GUINEVERE, KNIGHT };
 
 enum GameState
 {
@@ -118,7 +114,7 @@ Character get_character(int orignalHP)
     if (orignalHP == 888)              return Character::LANCELOT;
     if (orignalHP == 777)              return Character::GUINEVERE;
     if (check_prime(orignalHP))        return Character::PALADIN;
-    if (check_dragonknight(orignalHP)) return Character::UNDRAGONKNIGHT;
+    if (check_dragonknight(orignalHP)) return Character::DRAGONKNIGHT;
 
     return Character::KNIGHT;
 }
@@ -144,6 +140,9 @@ void copy_knight(ExKnight& exKnight, knight& oriKnight, bool reverse)
 
 int custom_callPhoenix(ExKnight &exKnight)
 {
+    // Get rid of poison from body
+    exKnight.poison = 0;
+
     knight oriKnight;
     copy_knight(exKnight, oriKnight, false);
     int i = callPhoenix(oriKnight, exKnight.maxHP);
@@ -160,11 +159,8 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
 
 
-    // TODO: Check autowin
-    bool autowin = (    (theKnight.odin > 0)                   ||
+    bool autowin = (    (theKnight.odin > 0)                    ||
                         (character == Character::ARTHUR)        ||
-                        (character == Character::DRAGONKNIGHT)  ||
-                        (character == Character::PALADIN)       ||
                         (character == Character::LANCELOT)      ||
                         (level > level_oppnent)
                     );
@@ -173,12 +169,36 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
         case Event::ULTIMECIA:
             if(theKnight.isExcalibur)
             {
+                if (theKnight.poison > 0)
+                    theKnight.HP = MAX(1, theKnight.HP / 3);
+
                 Game = GameState::FINISHED;
                 theKnight.nWin++;
             }
             else
             {
                 theKnight.HP = MAX(1, theKnight.HP / 3);
+                theKnight.nLose++;
+            }
+            break;
+
+        case Event::TORNBERRY:
+            // 5 + 1 = 6
+            if (theKnight.poison > 0)
+                break;
+
+            if (autowin)
+            {
+                theKnight.level = MIN(10, theKnight.level+1);
+                theKnight.nWin++;
+            }
+            else if (level < level_oppnent)
+            {
+                if (theKnight.character != Character::PALADIN && theKnight.character != Character::DRAGONKNIGHT)
+                    theKnight.poison = 6;
+                if (theKnight.poison > 0 && theKnight.antidote > 0)
+                    theKnight.antidote--;
+
                 theKnight.nLose++;
             }
             break;
@@ -207,10 +227,13 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
                 basedame = 8.5f;
             }
 
-            if (autowin)
+            if (autowin || theKnight.character == Character::PALADIN)
             {
                 theKnight.gil = MIN(999, theKnight.gil + gil);
                 theKnight.nWin++;
+
+                if(theKnight.poison > 0)
+                    theKnight.HP = (int)(theKnight.HP - level_oppnent*basedame*10.0f);
             }
             else if (level < level_oppnent)
             {
@@ -268,10 +291,11 @@ void init_knight(ExKnight* exKnight ,knight& oriKnight)
     exKnight->antidote = oriKnight.antidote;
     exKnight->gil = oriKnight.gil;
 
-    exKnight->nWin = exKnight->nLose = 0;
     exKnight->maxHP = oriKnight.HP;
+    exKnight->nWin = exKnight->nLose = 0;
+
     exKnight->odin = -1;
-    exKnight->lionHeart = 0;
+    exKnight->lionHeart = exKnight->poison = 0;
     exKnight->isMythril = false;
     exKnight->isPaladinW = exKnight->isLancelotW = exKnight->isGuinevere = false;
     exKnight->isExcalibur = false;
@@ -316,6 +340,8 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
             int nEvent = arrCastle[i].nEvent;
             for (j = 0; j < nEvent; ++j)
             {
+                theKnight.poison -= theKnight.poison > 0 ? 1 : 0;
+
                 if (events[j] >= 95 && events[j] <= 98)
                     handle_item(&theKnight, events[j]);
                 else if ((events[j] >= 1 && events[j] <= 7) || events[j] == 99)

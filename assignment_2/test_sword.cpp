@@ -126,4 +126,19 @@ TEST_CASE("Check fight", "[fight]")
         REQUIRE(compare_report(m_report, 6, 1, 1));
         delete m_report;
     }
+
+    // Example 6
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 172, 1, 0, 100);
+        castle arrCastle[] = { {{95}, 1},
+                    {{96, 97, 98, 6}, 4},
+                    {{1, 99}, 2},
+        };
+        m_report = game_main(theKnight, arrCastle, 3, mode, nPetal);
+        REQUIRE(m_report != NULL);
+        REQUIRE(compare_knight(&theKnight, 54, 3, 0, 200));
+        REQUIRE(compare_report(m_report, 5, 2, 1));
+        delete m_report;
+    }
 }
