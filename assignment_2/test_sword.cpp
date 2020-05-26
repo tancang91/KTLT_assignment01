@@ -65,7 +65,7 @@ bool compare_report(report *r, int nPetal, int nWin, int nLose)
     if(!r) return false;
     //std::cout << r->nPetal << " ";
     //std::cout << r->nWin << " ";
-    //std::cout << r->nLose << " ";
+    //std::cout << r->nLose << "\n";
 
     return r->nPetal == nPetal &&
             r->nWin == nWin &&
@@ -110,6 +110,20 @@ TEST_CASE("Check fight", "[fight]")
         REQUIRE(m_report != NULL);
         REQUIRE(compare_knight(&theKnight, 57, 6, 0, 100));
         REQUIRE(compare_report(m_report, 0, 1, 1));
+        delete m_report;
+    }
+
+    // Example 5
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 4, 1, 0, 100);
+        castle arrCastle[] = { {{95}, 1},
+                    {{96, 97, 98, 2, 99}, 5}
+        };
+        m_report = game_main(theKnight, arrCastle, 2, mode, nPetal);
+        REQUIRE(m_report != NULL);
+        REQUIRE(compare_knight(&theKnight, 52, 2, 0, 0));
+        REQUIRE(compare_report(m_report, 6, 1, 1));
         delete m_report;
     }
 }
