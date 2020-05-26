@@ -30,6 +30,13 @@ enum Character
     DRAGONKNIGHT = 4, GUINEVERE = 5, KNIGHT = 6
 };
 
+enum GameState
+{
+    GAMEOVER = 0,
+    RUNNING,
+    FINISHED
+} Game;
+
 struct ExKnight
 {
     int HP; int gil; int level; int antidote;
@@ -42,6 +49,8 @@ struct ExKnight
     // Whether obtained weapon of Paladin, Lancelot, Guinevere
     bool isPaladinW, isLancelotW, isGuinevere;
     bool isExcalibur;
+
+    int nWin, nLose;
 
     Character character;
 };
@@ -115,12 +124,13 @@ Character get_character(int orignalHP)
 }
 // }}}
 
-void handle_fight(struct ExKnight *theKnight, Event opponent, int eventNum)
+void handle_fight(struct ExKnight *theKnight, int opponent, int eventNum)
 {
     int level = theKnight->level;
     Character character = theKnight->character;
     int b = eventNum % 10;
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
+
 
     // TODO: Check autowin
     bool autowin = (    (theKnight->odin > 0)                   ||
@@ -132,6 +142,19 @@ void handle_fight(struct ExKnight *theKnight, Event opponent, int eventNum)
                     );
 
     switch (opponent) {
+        case Event::ULTIMECIA:
+            if(theKnight->isExcalibur)
+            {
+                Game = GameState::FINISHED;
+                theKnight->nWin++;
+            }
+            else
+            {
+                theKnight->HP = MAX(1, theKnight->HP / 3);
+                theKnight->nLose++;
+            }
+            break;
+
         default: {
             float basedame = 1.0f;
             int gil = 100;
@@ -170,6 +193,39 @@ void handle_fight(struct ExKnight *theKnight, Event opponent, int eventNum)
     // TODO: Check die, Call Phoenix
 }
 
+void handle_item(struct ExKnight *theKnight, int event)
+{
+    switch (event)
+    {
+        // Event 95
+        case Event::W_PALADIN:
+            theKnight->isPaladinW = true;
+            break;
+
+        // Event 96
+        case Event::W_LANCELOT:
+            theKnight->isLancelotW = true;
+            break;
+
+        // Event 97
+        case Event::W_GUINEVERE:
+            theKnight->isGuinevere = true;
+            break;
+
+        // Event 98
+        case Event::W_EXCALIBUR: {
+            bool can_get_excalibur = (theKnight->character == Character::ARTHUR) ||
+                        (theKnight->isGuinevere && theKnight->isPaladinW && theKnight->isLancelotW);
+
+            if (can_get_excalibur)
+                theKnight->isExcalibur = true;
+        } break;
+
+        default:
+            break;
+    }
+}
+
 
 void init_knight(ExKnight* exKnight ,knight& oriKnight)
 {
@@ -178,6 +234,7 @@ void init_knight(ExKnight* exKnight ,knight& oriKnight)
     exKnight->antidote = oriKnight.antidote;
     exKnight->gil = oriKnight.gil;
 
+    exKnight->nWin = exKnight->nLose = 0;
     exKnight->maxHP = oriKnight.HP;
     exKnight->odin = -1;
     exKnight->lionHeart = 0;
@@ -208,29 +265,58 @@ void init_knight(ExKnight* exKnight ,knight& oriKnight)
 }
 
 report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode, int nPetal)
+//void  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode, int nPetal, report *r)
 {
     ExKnight theKnight;
     init_knight(&theKnight, oriKnight);
 
-    int petal_count, win_count, lose_count;
-    petal_count = win_count = lose_count = 0;
-
-    int i;
-    for (i = 0; i < nCastle; ++i)
+    // Game loop
+    Game = GameState::RUNNING;
+    while (Game == GameState::RUNNING)
     {
-        int *events = arrCastle[i].arrEvent;
-        int nEvent = arrCastle[i].nEvent;
-        for (int j = 0; j < nEvent; ++j)
+        int i;
+        for (i = 0; i < nCastle && Game == GameState::RUNNING; ++i)
         {
+            int j;
+            int *events = arrCastle[i].arrEvent;
+            int nEvent = arrCastle[i].nEvent;
+            for (j = 0; j < nEvent; ++j)
+            {
+                if (events[j] >= 95 && events[j] <= 98)
+                    handle_item(&theKnight, events[j]);
+                else if ((events[j] >= 1 && events[j] <= 7) || events[j] == 99)
+                    handle_fight(&theKnight, events[j], j+1);
 
+                if (--nPetal == 0 && Game != GameState::FINISHED)
+                    Game = GameState::GAMEOVER;
+
+                if (Game != GameState::RUNNING)
+                    break;
+            }
+
+            // Knight got out of castle
+            if(j == nEvent)
+            {
+                theKnight.level = MIN(10, theKnight.level + 1);
+                theKnight.maxHP = MIN(999, theKnight.maxHP + 100);
+            }
         }
     }
 
+    // Return value to oriKnight
     oriKnight.HP = theKnight.HP;
     oriKnight.antidote = theKnight.antidote;
     oriKnight.gil = theKnight.gil;
     oriKnight.level = theKnight.level;
 
+    if (Game == GameState::FINISHED)
+    {
+        report *r = new report;
+        r->nLose = theKnight.nLose;
+        r->nWin = theKnight.nWin;
+        r->nPetal = nPetal;
+        return r;
+    }
     return NULL;
 }
 /********* End My Implementation ***********/
@@ -242,7 +328,7 @@ report*  walkthrough (knight& theKnight, castle arrCastle[], int nCastle, int mo
   //fighting for the existence of mankind here
 
  
-  // success or failure?	
+  // success or failure?
   pReturn = (bFlag)? new report : NULL;
   return pReturn;
 }

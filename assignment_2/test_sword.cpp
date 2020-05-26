@@ -1,6 +1,7 @@
 //#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 #include "test_sword.h"
+//#include "defs.h"
 
 
 #define sum(a,b,c) (a+b+c)
@@ -36,55 +37,79 @@ TEST_CASE("Check dragon knight", "[check_dragonknight]") {
 }
 // }}}
 
-/*
- *struct knight theKnight;
- *void set_knight(struct knight *theKnight, int HP, int level, int remedy, int maidenkiss, int phoenixdown) {
- *    theKnight->HP = HP;
- *    theKnight->level = level;
- *    theKnight->remedy = remedy;
- *    theKnight->maidenkiss = maidenkiss;
- *    theKnight->phoenixdown = phoenixdown;
- *
- *    theKnight->numCursed = 0;
- *    theKnight->previousLevel = 0;
- *    theKnight->sword = Item::NORMALSWORD; 
- *    theKnight->armor = Item::NORMALARMOR; 
- *}
- *
- *TEST_CASE("Check fight", "[fight]")
- *{
- *    // Check Frog
- *    {   set_knight(&theKnight, 998, 1 , 0, 0, 0);
- *        int events[] = {4,6,7};
- *        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 200); }
- *
- *    // Check BOWSER
- *    {   set_knight(&theKnight, 998, 1 , 0, 0, 0);
- *        int events[] = {4,99};
- *        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
- *
- *    {   set_knight(&theKnight, 999, 1 , 0, 0, 0); // Arthur
- *        int events[] = {4,99};
- *        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 1009); }
- *
- *    {   set_knight(&theKnight, 888, 2, 0, 0, 0); // Lancelot, even number
- *        int events[] = {4,99};
- *        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 898); }
- *
- *    {   set_knight(&theKnight, 888, 3, 0, 0, 0); // Lancelot, odd number
- *        int events[] = {4,99};
- *        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 898); }
- *
- *    {   set_knight(&theKnight, 11, 8, 0, 0, 0);
- *        int events[] = {4,99};
- *        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 21); }
- *
- *    {   set_knight(&theKnight, 12, 10, 0, 0, 0);
- *        int events[] = {99};
- *        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == 22); }
- *
- *    {   set_knight(&theKnight, 100, 9, 0, 0, 0);
- *        int events[] = {99};
- *        REQUIRE(game_main(&theKnight, events, sizeof(events)/sizeof(int)) == -1); }
- *}
- */
+knight theKnight;
+report *m_report;
+void set_knight(struct knight *theKnight, int HP, int level, int antidote, int gil)
+{
+    theKnight->HP = HP;
+    theKnight->level = level;
+    theKnight->antidote = antidote;
+    theKnight->gil = gil;
+}
+
+bool compare_knight(struct knight *theKnight, int HP, int level, int antidote, int gil)
+{
+    //std::cout << theKnight->HP << " ";
+    //std::cout << theKnight->level << " ";
+    //std::cout << theKnight->antidote << " ";
+    //std::cout << theKnight->gil << "\n";
+
+    return theKnight->HP == HP &&
+            theKnight->level == level &&
+            theKnight->antidote == antidote &&
+            theKnight->gil == gil;
+}
+
+bool compare_report(report *r, int nPetal, int nWin, int nLose)
+{
+    if(!r) return false;
+    //std::cout << r->nPetal << " ";
+    //std::cout << r->nWin << " ";
+    //std::cout << r->nLose << " ";
+
+    return r->nPetal == nPetal &&
+            r->nWin == nWin &&
+            r->nLose == nLose;
+}
+
+TEST_CASE("Check fight", "[fight]")
+{
+    int mode = 0;
+
+    {
+        int nPetal = 1;
+        set_knight(&theKnight, 172, 4, 0, 100);
+        castle arrCastle[] = { {{95,96,97}, 3},
+                    {{98,99}, 2}
+        };
+        m_report = game_main(theKnight, arrCastle, 2, mode, nPetal);
+        CHECK(m_report == NULL);
+        delete m_report;
+    }
+
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 172, 4, 0, 100);
+        castle arrCastle[] = { {{95,96,97}, 3},
+                    {{98,99}, 2}
+        };
+        m_report = game_main(theKnight, arrCastle, 2, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 172, 5, 0, 100));
+        REQUIRE(m_report != NULL);
+        REQUIRE(compare_report(m_report, 7, 1, 0));
+        delete m_report;
+    }
+
+    {
+        int nPetal = 8;
+        set_knight(&theKnight, 172, 4, 0, 100);
+        castle arrCastle[] = { {{96,98,99}, 3},
+                    {{97, 95}, 2}
+        };
+        m_report = game_main(theKnight, arrCastle, 2, mode, nPetal);
+        REQUIRE(m_report != NULL);
+        REQUIRE(compare_knight(&theKnight, 57, 6, 0, 100));
+        REQUIRE(compare_report(m_report, 0, 1, 1));
+        delete m_report;
+    }
+}
