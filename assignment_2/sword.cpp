@@ -177,7 +177,8 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             }
             else
             {
-                theKnight.HP = MAX(1, theKnight.HP / 3);
+                if (theKnight.character != Character::GUINEVERE)
+                    theKnight.HP = MAX(1, theKnight.HP / 3);
                 theKnight.nLose++;
             }
             break;
@@ -191,7 +192,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             else if (level < level_oppnent)
             {
                 if (theKnight.character != Character::GUINEVERE)
-                    theKnight.gil = MAX(1, theKnight.gil/2);
+                    theKnight.gil = MAX(1, theKnight.gil / 2);
                 theKnight.nLose++;
             }
             break;
@@ -223,7 +224,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             if (opponent == Event::MOONBRINGER)
             {
                 gil = 150;
-                basedame = 1.5f;
+                basedame = theKnight.character == Character::GUINEVERE ? 0.0f : 1.5f;
             }
             else if (opponent == Event::ELF)
             {
@@ -258,7 +259,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
         } break;
     }
 
-    // TODO: Check die, Call Phoenix
+    // Check die, Call Phoenix
     if (theKnight.HP <= 0)
         custom_callPhoenix(theKnight);
 }

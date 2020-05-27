@@ -38,11 +38,12 @@ TEST_CASE("Check dragon knight", "[check_dragonknight]") {
 }
 // }}}
 
-
-TEST_CASE("Check fight", "[fight]")
+// {{{ [example]
+TEST_CASE("Run example", "[example]")
 {
     int mode = 0;
 
+    // Example 2
     {
         int nPetal = 1;
         set_knight(&theKnight, 172, 4, 0, 100);
@@ -54,6 +55,7 @@ TEST_CASE("Check fight", "[fight]")
         delete m_report;
     }
 
+    // Example 3
     {
         int nPetal = 12;
         set_knight(&theKnight, 172, 4, 0, 100);
@@ -67,6 +69,7 @@ TEST_CASE("Check fight", "[fight]")
         delete m_report;
     }
 
+    // Example 4
     {
         int nPetal = 8;
         set_knight(&theKnight, 172, 4, 0, 100);
@@ -109,6 +112,16 @@ TEST_CASE("Check fight", "[fight]")
         delete m_report;
     }
 
+}
+
+
+// }}}
+
+TEST_CASE("Check fight", "[fight]")
+{
+    int mode = 0;
+
+    // Test Fight event 7
     {
         int nPetal = 12;
         set_knight(&theKnight, 172, 1, 0, 50);
@@ -116,6 +129,18 @@ TEST_CASE("Check fight", "[fight]")
         m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
         REQUIRE(compare_knight(&theKnight, 172, 1, 0, 25));
         REQUIRE(compare_report(m_report, 6,1,1));
+        delete m_report;
+    }
+
+    // Test GUINEVERE
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 777, 1, 0, 50);
+        castle arrCastle[] = { {{95,96,97,2}, 4},
+            {{99, 98}, 2} };
+        m_report = game_main(theKnight, arrCastle, 2, mode, nPetal);
+        print_knight(&theKnight);
+        REQUIRE(compare_knight(&theKnight, 777, 4, 0, 50));
         delete m_report;
     }
 }
