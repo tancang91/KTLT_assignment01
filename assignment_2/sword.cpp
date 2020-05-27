@@ -441,7 +441,8 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
                 else
                     handle_event(theKnight, event);
 
-                if (--nPetal == 0 && Game != GameState::FINISHED)
+                nPetal = MAX(0, nPetal-1);
+                if ((nPetal == 0 && theKnight.character != Character::ARTHUR) && Game != GameState::FINISHED)
                     Game = GameState::GAMEOVER;
 
                 if (Game != GameState::RUNNING) break;

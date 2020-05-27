@@ -160,6 +160,21 @@ TEST_CASE("Check fight", "[fight]")
 TEST_CASE("Check event", "[event]")
 {
     int mode = 0;
-
     // TODO: NINA
+}
+
+TEST_CASE("Check character", "[character]")
+{
+    int mode = 0;
+    // Arthur do not care Canh Hoa Hong
+    {
+        int nPetal = 1;
+        set_knight(&theKnight, 999, 1, 0, 50);
+        castle arrCastle[] = { {{95,98,99},3}};
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(m_report != NULL);
+        REQUIRE(compare_report(m_report, 0,1,0));
+        delete m_report;
+    }
+
 }
