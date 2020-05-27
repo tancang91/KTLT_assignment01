@@ -119,6 +119,12 @@ Character get_character(int orignalHP)
     return Character::KNIGHT;
 }
 // }}}
+// {{{ Check friendly number
+bool is_friendly_number(int a, int b)
+{
+    return false;
+}
+// }}}
 
 void copy_knight(ExKnight& exKnight, knight& oriKnight, bool reverse)
 {
@@ -150,14 +156,13 @@ int custom_callPhoenix(ExKnight &exKnight)
     return i;
 }
 
+// {{{ Handle fight
 void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
-//void handle_fight(struct ExKnight *theKnight, int opponent, int eventNum)
 {
     int level = theKnight.level;
     Character character = theKnight.character;
     int b = eventNum % 10;
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
-
 
     bool autowin = (    (theKnight.odin > 0)                    ||
                         (character == Character::ARTHUR)        ||
@@ -263,8 +268,79 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
     if (theKnight.HP <= 0)
         custom_callPhoenix(theKnight);
 }
+// }}}
 
+void handle_event(ExKnight& theKnight, int event)
+{
+    switch (event)
+    {
+        // Event 8
+        // TODO: Implement Friend number function
+        case Event::NINA: {
+            bool free_lunch =   (theKnight.character == Character::GUINEVERE) || 
+                                (theKnight.character == Character::PALADIN);
+            if (free_lunch)
+            {
+                theKnight.HP = theKnight.maxHP;
+                theKnight.poison = 0;
+                if (theKnight.character == Character::GUINEVERE)
+                    theKnight.gil = MIN(999, theKnight.gil + 50);
+            }
+            if (is_friendly_number(theKnight.HP, theKnight.gil))
+            {
+                theKnight.HP = theKnight.maxHP;
+                theKnight.poison = 0;
 
+                // Paladin will carry lion heart forever (-999)
+                theKnight.lionHeart = theKnight.character == Character::PALADIN ? -999 : 6;
+            }
+            else if (theKnight.gil >= 50)
+            {
+                if (!free_lunch)
+                {
+                    if (theKnight.poison > 0)
+                    {
+                        theKnight.poison = 0;
+                        theKnight.gil -= 50;
+                    }
+
+                    int temp = MIN(theKnight.maxHP - theKnight.HP, theKnight.gil);
+                    theKnight.gil -= temp;
+                    theKnight.HP += temp;
+                }
+            }
+        } break;
+
+        // Event 9
+        case Event::DURIAN:
+            break;
+
+        // Event 10
+        case Event::ANTIDOTE:
+            break;
+
+        // Event 11
+        case Event::ODIN:
+            break;
+
+        // Event 12
+        case Event::MERLIN:
+            break;
+
+        // Event 15
+        case Event::SCARLET:
+            break;
+
+        // Event 16
+        case Event::LOCKEDDOOR:
+            break;
+
+        default:
+            break;
+    }
+}
+
+// {{{ Handle item
 void handle_item(struct ExKnight *theKnight, int event)
 {
     switch (event)
@@ -297,7 +373,7 @@ void handle_item(struct ExKnight *theKnight, int event)
             break;
     }
 }
-
+// }}}
 
 void init_knight(ExKnight* exKnight ,knight& oriKnight)
 {
@@ -357,10 +433,13 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
             {
                 theKnight.poison -= theKnight.poison > 0 ? 1 : 0;
 
-                if (events[j] >= 95 && events[j] <= 98)
-                    handle_item(&theKnight, events[j]);
-                else if ((events[j] >= 1 && events[j] <= 7) || events[j] == 99)
-                    handle_fight(theKnight, events[j], j+1);
+                int event = events[j];
+                if (event >= 95 && event <= 98)
+                    handle_item(&theKnight, event);
+                else if ((event >= 1 && event <= 7) || event == 99 || event == 13 || event == 14)
+                    handle_fight(theKnight, event, j+1);
+                else
+                    handle_event(theKnight, event);
 
                 if (--nPetal == 0 && Game != GameState::FINISHED)
                     Game = GameState::GAMEOVER;

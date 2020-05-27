@@ -112,6 +112,19 @@ TEST_CASE("Run example", "[example]")
         delete m_report;
     }
 
+    // Example 7
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 172, 1, 0, 100);
+        castle arrCastle[] = { {{95,96,97,98,1,8,99}, 7} };
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+
+        REQUIRE(m_report != NULL);
+        REQUIRE(compare_knight(&theKnight, 172, 1, 0, 50));
+        REQUIRE(compare_report(m_report, 5, 1, 1));
+        delete m_report;
+    }
+
 }
 
 
@@ -139,8 +152,14 @@ TEST_CASE("Check fight", "[fight]")
         castle arrCastle[] = { {{95,96,97,2}, 4},
             {{99, 98}, 2} };
         m_report = game_main(theKnight, arrCastle, 2, mode, nPetal);
-        print_knight(&theKnight);
         REQUIRE(compare_knight(&theKnight, 777, 4, 0, 50));
         delete m_report;
     }
+}
+
+TEST_CASE("Check event", "[event]")
+{
+    int mode = 0;
+
+    // TODO: NINA
 }
