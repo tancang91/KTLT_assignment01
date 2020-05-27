@@ -162,7 +162,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
     bool autowin = (    (theKnight.odin > 0)                    ||
                         (character == Character::ARTHUR)        ||
                         (character == Character::LANCELOT)      ||
-                        (level > level_oppnent)
+                        (level >= level_oppnent)
                     );
 
     switch (opponent) {
@@ -178,6 +178,20 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             else
             {
                 theKnight.HP = MAX(1, theKnight.HP / 3);
+                theKnight.nLose++;
+            }
+            break;
+
+        case Event::QUEENCARDS:
+            if (autowin)
+            {
+                theKnight.gil = MIN(999, theKnight.gil*2);
+                theKnight.nWin++;
+            }
+            else if (level < level_oppnent)
+            {
+                if (theKnight.character != Character::GUINEVERE)
+                    theKnight.gil = MAX(1, theKnight.gil/2);
                 theKnight.nLose++;
             }
             break;

@@ -3,8 +3,9 @@
 #include "test_sword.h"
 //#include "defs.h"
 
-
 #define sum(a,b,c) (a+b+c)
+knight theKnight;
+report *m_report;
 
 // {{{ Check prime
 TEST_CASE( "Check Prime", "[check_prime]" ) {
@@ -37,40 +38,6 @@ TEST_CASE("Check dragon knight", "[check_dragonknight]") {
 }
 // }}}
 
-knight theKnight;
-report *m_report;
-void set_knight(struct knight *theKnight, int HP, int level, int antidote, int gil)
-{
-    theKnight->HP = HP;
-    theKnight->level = level;
-    theKnight->antidote = antidote;
-    theKnight->gil = gil;
-}
-
-bool compare_knight(struct knight *theKnight, int HP, int level, int antidote, int gil)
-{
-    //std::cout << theKnight->HP << " ";
-    //std::cout << theKnight->level << " ";
-    //std::cout << theKnight->antidote << " ";
-    //std::cout << theKnight->gil << "\n";
-
-    return theKnight->HP == HP &&
-            theKnight->level == level &&
-            theKnight->antidote == antidote &&
-            theKnight->gil == gil;
-}
-
-bool compare_report(report *r, int nPetal, int nWin, int nLose)
-{
-    if(!r) return false;
-    //std::cout << r->nPetal << " ";
-    //std::cout << r->nWin << " ";
-    //std::cout << r->nLose << "\n";
-
-    return r->nPetal == nPetal &&
-            r->nWin == nWin &&
-            r->nLose == nLose;
-}
 
 TEST_CASE("Check fight", "[fight]")
 {
@@ -139,6 +106,16 @@ TEST_CASE("Check fight", "[fight]")
         REQUIRE(m_report != NULL);
         REQUIRE(compare_knight(&theKnight, 54, 3, 0, 200));
         REQUIRE(compare_report(m_report, 5, 2, 1));
+        delete m_report;
+    }
+
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 172, 1, 0, 50);
+        castle arrCastle[] = { {{95, 96, 97, 98, 7, 99}, 6} };
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 172, 1, 0, 25));
+        REQUIRE(compare_report(m_report, 6,1,1));
         delete m_report;
     }
 }
