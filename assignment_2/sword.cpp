@@ -156,6 +156,12 @@ int custom_callPhoenix(ExKnight &exKnight)
     return i;
 }
 
+void increase_level(ExKnight &exKnight)
+{
+    exKnight.level = MIN(10, exKnight.level + 1);
+    exKnight.maxHP = MIN(999, exKnight.maxHP + 100);
+}
+
 // {{{ Handle fight
 void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
 {
@@ -209,7 +215,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
 
             if (autowin)
             {
-                theKnight.level = MIN(10, theKnight.level+1);
+                increase_level(theKnight);
                 theKnight.nWin++;
             }
             else if (level < level_oppnent)
@@ -465,10 +471,7 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
 
             // Knight got out of castle
             if(j == nEvent)
-            {
-                theKnight.level = MIN(10, theKnight.level + 1);
-                theKnight.maxHP = MIN(999, theKnight.maxHP + 100);
-            }
+                increase_level(theKnight);
         }
     }
 
