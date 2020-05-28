@@ -319,6 +319,12 @@ void handle_event(ExKnight& theKnight, int event)
 
         // Event 10
         case Event::ANTIDOTE:
+            theKnight.antidote = MIN(99, theKnight.antidote+1);
+            if (theKnight.poison > 0)
+            {
+                theKnight.poison = 0;
+                theKnight.antidote = MAX(0, theKnight.antidote-1);
+            }
             break;
 
         // Event 11

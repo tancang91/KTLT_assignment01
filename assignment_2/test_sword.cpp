@@ -134,14 +134,15 @@ TEST_CASE("Check fight", "[fight]")
 {
     int mode = 0;
 
-    // Test Fight event 7 and event durican 9
+    // Test Fight event 7
+    // Event Durican 9, Antidote 10
     {
         int nPetal = 12;
         set_knight(&theKnight, 172, 1, 0, 50);
-        castle arrCastle[] = { {{95, 96, 97, 98, 7, 9, 99}, 7} };
+        castle arrCastle[] = { {{95, 96, 97, 98, 7, 9, 10, 99}, 8} };
         m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
-        REQUIRE(compare_knight(&theKnight, 172, 1, 0, 25));
-        REQUIRE(compare_report(m_report, 10,1,1));
+        REQUIRE(compare_knight(&theKnight, 172, 1, 1, 25));
+        REQUIRE(compare_report(m_report, 9,1,1));
         delete m_report;
     }
 

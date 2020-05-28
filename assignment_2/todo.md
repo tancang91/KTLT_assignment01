@@ -14,7 +14,7 @@
         - [ ] Friend number function
 
     - [X] Event 9: Durian forest
-    - [ ] Event 10: Antidote
+    - [X] Event 10: Antidote
     - [ ] Event 11: Odin
     - [ ] Event 12: Witch Merlin
     - [ ] Event 15: Scarlet Hakama
