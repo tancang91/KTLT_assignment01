@@ -125,7 +125,7 @@ bool is_friendly_number(int a, int b)
     return false;
 }
 // }}}
-
+// {{{ Helper function
 void copy_knight(ExKnight& exKnight, knight& oriKnight, bool reverse)
 {
     /* Copy from exKnight to oriKnight */
@@ -161,6 +161,7 @@ void increase_level(ExKnight &exKnight)
     exKnight.level = MIN(10, exKnight.level + 1);
     exKnight.maxHP = MIN(999, exKnight.maxHP + 100);
 }
+// }}}
 
 // {{{ Handle fight
 void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
@@ -340,6 +341,9 @@ void handle_event(ExKnight& theKnight, int event)
 
         // Event 12
         case Event::MERLIN:
+            theKnight.poison = 0;
+            increase_level(theKnight);
+            theKnight.HP = theKnight.maxHP;
             break;
 
         // Event 15
