@@ -162,6 +162,19 @@ TEST_CASE("Check event", "[event]")
 {
     int mode = 0;
     // TODO: NINA
+
+    // Event Odin 11
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 172, 1, 0, 100);
+        castle arrCastle[] = { {{11, 95, 96, 97, 98, 6}, 6},
+                    {{1, 99}, 2},
+        };
+        m_report = game_main(theKnight, arrCastle, 3, mode, nPetal);
+        REQUIRE(theKnight.HP == 172);
+        REQUIRE(compare_report(m_report, 4, 3, 0));
+        delete m_report;
+    }
 }
 
 TEST_CASE("Check character", "[character]")

@@ -329,6 +329,7 @@ void handle_event(ExKnight& theKnight, int event)
 
         // Event 11
         case Event::ODIN:
+            theKnight.odin = 6;
             break;
 
         // Event 12
@@ -440,6 +441,7 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
             for (j = 0; j < nEvent; ++j)
             {
                 theKnight.poison -= theKnight.poison > 0 ? 1 : 0;
+                theKnight.odin -= theKnight.odin > 0 ? 1 : 0;
 
                 int event = events[j];
                 if (event >= 95 && event <= 98)
