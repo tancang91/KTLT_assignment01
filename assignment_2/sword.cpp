@@ -313,6 +313,8 @@ void handle_event(ExKnight& theKnight, int event)
 
         // Event 9
         case Event::DURIAN:
+            theKnight.poison = 0;
+            theKnight.HP = theKnight.maxHP;
             break;
 
         // Event 10
@@ -439,7 +441,12 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
                 else if ((event >= 1 && event <= 7) || event == 99 || event == 13 || event == 14)
                     handle_fight(theKnight, event, j+1);
                 else
+                {
                     handle_event(theKnight, event);
+
+                    if (event == Event::DURIAN)
+                        nPetal = MIN(99, nPetal+5);
+                }
 
                 nPetal = MAX(0, nPetal-1);
                 if ((nPetal == 0 && theKnight.character != Character::ARTHUR) && Game != GameState::FINISHED)

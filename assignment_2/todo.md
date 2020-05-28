@@ -10,7 +10,10 @@
     - [ ] Fight: hard opponent (13, 14)
 
     - [ ] Event 8: Nina
-    - [ ] Event 9: Durian forest
+        - [X] Basic infrastructure.
+        - [ ] Friend number function
+
+    - [X] Event 9: Durian forest
     - [ ] Event 10: Antidote
     - [ ] Event 11: Odin
     - [ ] Event 12: Witch Merlin
@@ -24,4 +27,4 @@
 ## Bugfix
 
     - [X] Fight: Guinevere character ability when lost the fight.
-    - [ ] Arthur character do not care about Canh Hoa Hong.
+    - [X] Arthur character do not care about Canh Hoa Hong.
