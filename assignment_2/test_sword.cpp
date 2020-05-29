@@ -125,6 +125,16 @@ TEST_CASE("Run example", "[example]")
         delete m_report;
     }
 
+    // Example 9
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 172, 2, 0, 100);
+        castle arrCastle[] = { {{95,16,96,97,98,99}, 6}};
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 172, 3, 0, 100));
+        REQUIRE(compare_report(m_report, 4, 1, 0));
+        delete m_report;
+    }
 }
 
 
@@ -195,6 +205,17 @@ TEST_CASE("Check event", "[event]")
         m_report = game_main(theKnight, arrCastle, 3, mode, nPetal);
         REQUIRE(compare_knight(&theKnight, 372, 3, 0, 100));
         REQUIRE(compare_report(m_report, 4, 2, 0));
+        delete m_report;
+    }
+
+    // Event LOCKEDDOOR & LANCELOT
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 888, 2, 0, 100);
+        castle arrCastle[] = { {{95,16,96,97,98,99}, 6}};
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 888, 2, 0, 100));
+        REQUIRE(compare_report(m_report, 6, 1, 0));
         delete m_report;
     }
 }

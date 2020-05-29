@@ -378,8 +378,8 @@ void handle_event(ExKnight& theKnight, int event)
             break;
 
         // Event 16
-        case Event::LOCKEDDOOR:
-            break;
+        //case Event::LOCKEDDOOR:
+            //break;
 
         default:
             break;
@@ -493,6 +493,14 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
 
                     if (event == Event::DURIAN)
                         nPetal = MIN(99, nPetal+5);
+                    else if (event == Event::LOCKEDDOOR)
+                    {
+                        bool isPass = (theKnight.level > ((j+1)%10))                    ||
+                                        (theKnight.character == Character::LANCELOT)    ||
+                                        (theKnight.character == Character::DRAGONKNIGHT);
+                        if (!isPass)
+                            j = nEvent - 1;
+                    }
                 }
 
                 nPetal = MAX(0, nPetal-1);
