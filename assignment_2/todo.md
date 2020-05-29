@@ -28,4 +28,4 @@
 
     - [X] Fight: Guinevere character ability when lost the fight.
     - [X] Arthur character do not care about Canh Hoa Hong.
-    - [ ] LionHeart ability.
+    - [X] LionHeart ability.

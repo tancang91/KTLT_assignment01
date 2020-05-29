@@ -172,6 +172,8 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
     int level_oppnent = eventNum>6 ? (b>5?b:5):b;
 
     bool autowin = (    (theKnight.odin > 0)                    ||
+                        (theKnight.lionHeart > 0)               ||
+                        (theKnight.lionHeart == -999)           || // -999 mean hold forever (Paladin)
                         (character == Character::ARTHUR)        ||
                         (character == Character::LANCELOT)      ||
                         (level >= level_oppnent)
@@ -179,7 +181,9 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
 
     switch (opponent) {
         case Event::ULTIMECIA:
-            if(theKnight.isExcalibur)
+            if (    theKnight.isExcalibur       ||
+                    theKnight.lionHeart > 0     ||
+                    theKnight.lionHeart == -999)
             {
                 if (theKnight.poison > 0)
                     theKnight.HP = MAX(1, theKnight.HP / 3);
@@ -476,6 +480,7 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
             {
                 theKnight.poison -= theKnight.poison > 0 ? 1 : 0;
                 theKnight.odin -= theKnight.odin > 0 ? 1 : 0;
+                theKnight.lionHeart -= theKnight.lionHeart > 0 ? 1 : 0;
 
                 int event = events[j];
                 if (event >= 95 && event <= 98)
