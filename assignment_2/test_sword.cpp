@@ -156,6 +156,17 @@ TEST_CASE("Check fight", "[fight]")
         REQUIRE(compare_knight(&theKnight, 777, 4, 0, 50));
         delete m_report;
     }
+
+    // Test OMEGAWEAPON
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 100, 10, 0, 50);
+        castle arrCastle[] = { {{95,96,97,13,98,99}, 6}};
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 50, 10, 0, 0));
+        REQUIRE(compare_report(m_report, 6,1,1));
+        delete m_report;
+    }
 }
 
 TEST_CASE("Check event", "[event]")

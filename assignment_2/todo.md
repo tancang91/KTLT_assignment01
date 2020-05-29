@@ -15,8 +15,8 @@
 
     - [X] Event 9: Durian forest
     - [X] Event 10: Antidote
-    - [ ] Event 11: Odin
-    - [ ] Event 12: Witch Merlin
+    - [X] Event 11: Odin
+    - [X] Event 12: Witch Merlin
     - [ ] Event 15: Scarlet Hakama
     - [ ] Event 16: LockedDoor
 
@@ -28,3 +28,4 @@
 
     - [X] Fight: Guinevere character ability when lost the fight.
     - [X] Arthur character do not care about Canh Hoa Hong.
+    - [ ] LionHeart ability.

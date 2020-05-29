@@ -41,7 +41,7 @@ struct ExKnight
 
     int odin, lionHeart, poison;
 
-    bool isMythril;
+    bool isMythril; bool winOmega;
     // Whether obtained weapon of Paladin, Lancelot, Guinevere
     bool isPaladinW, isLancelotW, isGuinevere;
     bool isExcalibur;
@@ -192,6 +192,29 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
                 if (theKnight.character != Character::GUINEVERE)
                     theKnight.HP = MAX(1, theKnight.HP / 3);
                 theKnight.nLose++;
+            }
+            break;
+
+        case Event::OMEGAWEAPON:
+            if (!theKnight.winOmega)
+            {
+                bool win = (theKnight.isExcalibur && theKnight.level == 10) ||
+                            (theKnight.character == Character::DRAGONKNIGHT && theKnight.lionHeart > 0);
+                if (win)
+                {
+                    while (theKnight.level != 10)
+                        increase_level(theKnight);
+
+                    theKnight.gil = 999;
+                    theKnight.winOmega = true;
+                    theKnight.nWin++;
+                }
+                else
+                {
+                    theKnight.HP = 0;
+                    theKnight.nLose++;
+                }
+
             }
             break;
 
@@ -404,9 +427,10 @@ void init_knight(ExKnight* exKnight ,knight& oriKnight)
     exKnight->maxHP = oriKnight.HP;
     exKnight->nWin = exKnight->nLose = 0;
 
-    exKnight->odin = -1;
+    exKnight->odin = 0;
     exKnight->lionHeart = exKnight->poison = 0;
     exKnight->isMythril = false;
+    exKnight->winOmega = false;
     exKnight->isPaladinW = exKnight->isLancelotW = exKnight->isGuinevere = false;
     exKnight->isExcalibur = false;
 
