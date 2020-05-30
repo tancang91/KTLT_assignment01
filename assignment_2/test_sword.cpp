@@ -218,6 +218,18 @@ TEST_CASE("Check event", "[event]")
         REQUIRE(compare_report(m_report, 6, 1, 0));
         delete m_report;
     }
+
+    // Event Hakama & Durian
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 14, 2, 0, 100);
+        castle arrCastle[] = { {{10,95,96,97,98,15,7,9,99}, 9}};
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        //print_knight(&theKnight); print_report(m_report);
+        REQUIRE(compare_knight(&theKnight, 14, 2, 1, 100));
+        REQUIRE(compare_report(m_report, 97, 1, 1));
+        delete m_report;
+    }
 }
 
 TEST_CASE("Check character", "[character]")

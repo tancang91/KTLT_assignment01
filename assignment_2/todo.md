@@ -4,7 +4,6 @@
 
     - [X] Special item (95, 96, 97, 98)
     - [X] Determine true character.
-    - [ ] Friend Number
 
     - [X] Fight: normal opponent (1, 2, 3, 4, 5, 6, 7, 99)
     - [ ] Fight: hard opponent (13, 14)
@@ -17,8 +16,11 @@
     - [X] Event 10: Antidote
     - [X] Event 11: Odin
     - [X] Event 12: Witch Merlin
-    - [ ] Event 15: Scarlet Hakama
-    - [ ] Event 16: LockedDoor
+    - [X] Event 15: Scarlet Hakama
+    - [X] Event 16: LockedDoor
+
+    - [ ] Mode 1
+    - [ ] Mode 2
 
 ## Unit test
 

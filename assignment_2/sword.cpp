@@ -19,7 +19,7 @@ enum Event
     // Non-trivia fighting opponent
     OMEGAWEAPON = 13, HADES = 14,
     // Special Event
-    SCARLET = 15, LOCKEDDOOR = 16,
+    HAKAMA = 15, LOCKEDDOOR = 16,
     // Weapon to defeat ULTIMECIA
     W_PALADIN = 95, W_LANCELOT = 96, W_GUINEVERE = 97, W_EXCALIBUR = 98,
     ULTIMECIA = 99
@@ -41,7 +41,7 @@ struct ExKnight
 
     int odin, lionHeart, poison;
 
-    bool isMythril; bool winOmega;
+    bool isMythril, winOmega, hakama;
     // Whether obtained weapon of Paladin, Lancelot, Guinevere
     bool isPaladinW, isLancelotW, isGuinevere;
     bool isExcalibur;
@@ -161,6 +161,49 @@ void increase_level(ExKnight &exKnight)
     exKnight.level = MIN(10, exKnight.level + 1);
     exKnight.maxHP = MIN(999, exKnight.maxHP + 100);
 }
+
+void init_knight(ExKnight* exKnight ,knight& oriKnight)
+{
+    // Original attribute of knight
+    exKnight->HP = oriKnight.HP;
+    exKnight->level = oriKnight.level;
+    exKnight->antidote = oriKnight.antidote;
+    exKnight->gil = oriKnight.gil;
+
+    exKnight->maxHP = oriKnight.HP;
+    exKnight->nWin = exKnight->nLose = 0;
+
+    // Event with countdown.
+    exKnight->odin = 0;
+    exKnight->lionHeart = exKnight->poison = 0;
+
+    // Special item
+    exKnight->isMythril = exKnight->hakama= false;
+    exKnight->winOmega = false;
+    exKnight->isPaladinW = exKnight->isLancelotW = exKnight->isGuinevere = false;
+    exKnight->isExcalibur = false;
+
+    Character character = get_character(oriKnight.HP);
+    exKnight->character = character;
+
+    switch(character)
+    {
+        case Character::LANCELOT:
+            exKnight->isLancelotW = true;
+            break;
+
+        case Character::PALADIN:
+            exKnight->isPaladinW = true;
+            break;
+
+        case Character::GUINEVERE:
+            exKnight->isGuinevere = true;
+            break;
+
+        default:
+            break;
+    }
+}
 // }}}
 
 // {{{ Handle fight
@@ -230,7 +273,8 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             }
             else if (level < level_oppnent)
             {
-                if (theKnight.character != Character::GUINEVERE)
+                bool notDecrease = (theKnight.hakama) || (theKnight.character == Character::GUINEVERE);
+                if (!notDecrease)
                     theKnight.gil = MAX(1, theKnight.gil / 2);
                 theKnight.nLose++;
             }
@@ -263,7 +307,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             if (opponent == Event::MOONBRINGER)
             {
                 gil = 150;
-                basedame = theKnight.character == Character::GUINEVERE ? 0.0f : 1.5f;
+                basedame = (theKnight.character == Character::GUINEVERE) ? 0.0f : 1.5f;
             }
             else if (opponent == Event::ELF)
             {
@@ -311,8 +355,11 @@ void handle_event(ExKnight& theKnight, int event)
         // Event 8
         // TODO: Implement Friend number function
         case Event::NINA: {
+            bool isFriendly = is_friendly_number(theKnight.HP, theKnight.gil);
             bool free_lunch =   (theKnight.character == Character::GUINEVERE) || 
-                                (theKnight.character == Character::PALADIN);
+                                (theKnight.character == Character::PALADIN)   ||
+                                (theKnight.hakama);
+
             if (free_lunch)
             {
                 theKnight.HP = theKnight.maxHP;
@@ -320,7 +367,7 @@ void handle_event(ExKnight& theKnight, int event)
                 if (theKnight.character == Character::GUINEVERE)
                     theKnight.gil = MIN(999, theKnight.gil + 50);
             }
-            if (is_friendly_number(theKnight.HP, theKnight.gil))
+            if (isFriendly)
             {
                 theKnight.HP = theKnight.maxHP;
                 theKnight.poison = 0;
@@ -374,7 +421,8 @@ void handle_event(ExKnight& theKnight, int event)
             break;
 
         // Event 15
-        case Event::SCARLET:
+        case Event::HAKAMA:
+            theKnight.hakama = true;
             break;
 
         // Event 16
@@ -421,44 +469,6 @@ void handle_item(struct ExKnight *theKnight, int event)
 }
 // }}}
 
-void init_knight(ExKnight* exKnight ,knight& oriKnight)
-{
-    exKnight->HP = oriKnight.HP;
-    exKnight->level = oriKnight.level;
-    exKnight->antidote = oriKnight.antidote;
-    exKnight->gil = oriKnight.gil;
-
-    exKnight->maxHP = oriKnight.HP;
-    exKnight->nWin = exKnight->nLose = 0;
-
-    exKnight->odin = 0;
-    exKnight->lionHeart = exKnight->poison = 0;
-    exKnight->isMythril = false;
-    exKnight->winOmega = false;
-    exKnight->isPaladinW = exKnight->isLancelotW = exKnight->isGuinevere = false;
-    exKnight->isExcalibur = false;
-
-    Character character = get_character(oriKnight.HP);
-    exKnight->character = character;
-
-    switch(character)
-    {
-        case Character::LANCELOT:
-            exKnight->isLancelotW = true;
-            break;
-
-        case Character::PALADIN:
-            exKnight->isPaladinW = true;
-            break;
-
-        case Character::GUINEVERE:
-            exKnight->isGuinevere = true;
-            break;
-
-        default:
-            break;
-    }
-}
 
 report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode, int nPetal)
 //void  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode, int nPetal, report *r)
@@ -492,7 +502,7 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
                     handle_event(theKnight, event);
 
                     if (event == Event::DURIAN)
-                        nPetal = MIN(99, nPetal+5);
+                        nPetal = theKnight.hakama ? 99 : MIN(99, nPetal+5);
                     else if (event == Event::LOCKEDDOOR)
                     {
                         bool isPass = (theKnight.level > ((j+1)%10))                    ||
