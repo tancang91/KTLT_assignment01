@@ -216,7 +216,6 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
 
     bool autowin = (    (theKnight.odin > 0)                    ||
                         (theKnight.lionHeart > 0)               ||
-                        (theKnight.lionHeart == -999)           || // -999 mean hold forever (Paladin)
                         (character == Character::ARTHUR)        ||
                         (character == Character::LANCELOT)      ||
                         (level >= level_oppnent)
@@ -224,9 +223,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
 
     switch (opponent) {
         case Event::ULTIMECIA:
-            if (    theKnight.isExcalibur       ||
-                    theKnight.lionHeart > 0     ||
-                    theKnight.lionHeart == -999)
+            if (theKnight.isExcalibur || theKnight.lionHeart > 0)
             {
                 if (theKnight.poison > 0)
                     theKnight.HP = MAX(1, theKnight.HP / 3);
@@ -241,6 +238,25 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
                 theKnight.nLose++;
             }
             break;
+
+/*
+ *        case Event::HADES: {
+ *            if (theKnight.odin > 0 && theKnight.character != Character::DRAGONKNIGHT)
+ *                theKnight.odin = -1;
+ *
+ *            bool eternalLove = (theKnight.isLancelotW && theKnight.isGuinevere) ||
+ *                                (theKnight.isGuinevere && theKnight.character == Character::ARTHUR) ||
+ *                                (theKnight.isGuinevere && theKnight.character == Character::LANCELOT) ||
+ *                                (theKnight.isLancelotW && theKnight.character == Character::GUINEVERE);
+ *
+ *            if (eternalLove || (level >= level_oppnent) || (theKnight.lionHeart > 0))
+ *            {
+ *                theKnight.isMythril = true;
+ *                theKnight.nWin++;
+ *            }
+ *
+ *        } break;
+ */
 
         case Event::OMEGAWEAPON:
             if (!theKnight.winOmega)
@@ -372,8 +388,8 @@ void handle_event(ExKnight& theKnight, int event)
                 theKnight.HP = theKnight.maxHP;
                 theKnight.poison = 0;
 
-                // Paladin will carry lion heart forever (-999)
-                theKnight.lionHeart = theKnight.character == Character::PALADIN ? -999 : 6;
+                // Paladin will carry lion heart forever (999)
+                theKnight.lionHeart = theKnight.character == Character::PALADIN ? 999 : 6;
             }
             else if (theKnight.gil >= 50)
             {
@@ -490,7 +506,9 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
             {
                 theKnight.poison -= theKnight.poison > 0 ? 1 : 0;
                 theKnight.odin -= theKnight.odin > 0 ? 1 : 0;
-                theKnight.lionHeart -= theKnight.lionHeart > 0 ? 1 : 0;
+                //theKnight.lionHeart -= theKnight.lionHeart > 0 ? 1 : 0;
+                if (theKnight.lionHeart > 0 && theKnight.lionHeart <= 6)
+                    theKnight.lionHeart--;
 
                 int event = events[j];
                 if (event >= 95 && event <= 98)
