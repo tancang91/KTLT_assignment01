@@ -6,7 +6,7 @@
     - [X] Determine true character.
 
     - [X] Fight: normal opponent (1, 2, 3, 4, 5, 6, 7, 99)
-    - [ ] Fight: hard opponent (13, 14)
+    - [X] Fight: hard opponent (13, 14)
 
     - [ ] Event 8: Nina
         - [X] Basic infrastructure.

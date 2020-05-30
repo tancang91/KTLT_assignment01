@@ -112,7 +112,7 @@ TEST_CASE("Run example", "[example]")
         delete m_report;
     }
 
-    // Example 7
+    // Example 6b
     {
         int nPetal = 12;
         set_knight(&theKnight, 172, 1, 0, 100);
@@ -125,7 +125,29 @@ TEST_CASE("Run example", "[example]")
         delete m_report;
     }
 
-    // Example 9
+    // Example 7
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 172, 1, 0, 100);
+        castle arrCastle[] = { {{14,95,96,97,98,14,6,99}, 8} };
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 57, 1, 0, 100));
+        REQUIRE(compare_report(m_report, 4, 2, 2));
+        delete m_report;
+    }
+
+    // Example 8
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 172, 3, 0, 100);
+        castle arrCastle[] = { {{11,14,95,96,97,98,11,1,99}, 9} };
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 172, 3, 0, 100));
+        REQUIRE(compare_report(m_report, 3, 2, 1));
+        delete m_report;
+    }
+
+    // Example 9 (LOCKEDDOOR)
     {
         int nPetal = 12;
         set_knight(&theKnight, 172, 2, 0, 100);
@@ -133,6 +155,17 @@ TEST_CASE("Run example", "[example]")
         m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
         REQUIRE(compare_knight(&theKnight, 172, 3, 0, 100));
         REQUIRE(compare_report(m_report, 4, 1, 0));
+        delete m_report;
+    }
+
+    // Example 9 (Arthur)
+    {
+        int nPetal = 1;
+        set_knight(&theKnight, 999, 2, 0, 100);
+        castle arrCastle[] = { {{10,98,99,95,96,97}, 6} };
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 999, 2, 1, 100));
+        REQUIRE(compare_report(m_report, 0, 1, 0));
         delete m_report;
     }
 }
@@ -225,9 +258,19 @@ TEST_CASE("Check event", "[event]")
         set_knight(&theKnight, 14, 2, 0, 100);
         castle arrCastle[] = { {{10,95,96,97,98,15,7,9,99}, 9}};
         m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
-        //print_knight(&theKnight); print_report(m_report);
         REQUIRE(compare_knight(&theKnight, 14, 2, 1, 100));
         REQUIRE(compare_report(m_report, 97, 1, 1));
+        delete m_report;
+    }
+
+    // Lose to Hades
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 120, 1, 0, 140);
+        castle arrCastle[] = { {{95,96,97,98,14,99}, 6} };
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 60, 1, 0, 40));
+        REQUIRE(compare_report(m_report, 6, 1, 1));
         delete m_report;
     }
 }
@@ -243,7 +286,25 @@ TEST_CASE("Check character", "[character]")
         m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
         REQUIRE(m_report != NULL);
         REQUIRE(compare_report(m_report, 0,1,0));
-        delete m_report;
     }
 
+    SECTION("DRAGONKNIGHT") {
+        int nPetal = 12;
+        set_knight(&theKnight, 12, 3, 0, 100);
+
+        SECTION("Odin does not die") {
+            castle arrCastle[] = { {{11,14,95,96,97,98,11,5,99}, 9} };
+            m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+            REQUIRE(compare_knight(&theKnight, 12, 3, 0, 950));
+            REQUIRE(compare_report(m_report, 3, 3, 0));
+        }
+
+        SECTION("Odin win hades") {
+            castle arrCastle[] = { {{11,95,96,97,98,14,5,99}, 8} };
+            m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+            REQUIRE(compare_knight(&theKnight, 12, 3, 0, 100));
+            REQUIRE(compare_report(m_report, 4, 2, 1));
+        }
+    }
+    delete m_report;
 }

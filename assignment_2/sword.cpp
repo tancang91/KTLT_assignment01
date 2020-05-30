@@ -210,9 +210,9 @@ void init_knight(ExKnight* exKnight ,knight& oriKnight)
 void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
 {
     int level = theKnight.level;
-    Character character = theKnight.character;
+    const Character character = theKnight.character;
     int b = eventNum % 10;
-    int level_oppnent = eventNum>6 ? (b>5?b:5):b;
+    const int level_oppnent = eventNum>6 ? (b>5?b:5):b;
 
     bool autowin = (    (theKnight.odin > 0)                    ||
                         (theKnight.lionHeart > 0)               ||
@@ -233,36 +233,43 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             }
             else
             {
-                if (theKnight.character != Character::GUINEVERE)
+                if ( !theKnight.isMythril && (character != Character::GUINEVERE) )
                     theKnight.HP = MAX(1, theKnight.HP / 3);
                 theKnight.nLose++;
             }
             break;
 
-/*
- *        case Event::HADES: {
- *            if (theKnight.odin > 0 && theKnight.character != Character::DRAGONKNIGHT)
- *                theKnight.odin = -1;
- *
- *            bool eternalLove = (theKnight.isLancelotW && theKnight.isGuinevere) ||
- *                                (theKnight.isGuinevere && theKnight.character == Character::ARTHUR) ||
- *                                (theKnight.isGuinevere && theKnight.character == Character::LANCELOT) ||
- *                                (theKnight.isLancelotW && theKnight.character == Character::GUINEVERE);
- *
- *            if (eternalLove || (level >= level_oppnent) || (theKnight.lionHeart > 0))
- *            {
- *                theKnight.isMythril = true;
- *                theKnight.nWin++;
- *            }
- *
- *        } break;
- */
+        case Event::HADES: {
+            if (theKnight.odin > 0 && character != Character::DRAGONKNIGHT)
+                theKnight.odin = -1;
+
+            bool eternalLove = ( !theKnight.isExcalibur && theKnight.isLancelotW && theKnight.isGuinevere) ||
+                                ( theKnight.isGuinevere && character == Character::ARTHUR ) ||
+                                ( theKnight.isGuinevere && character == Character::LANCELOT ) ||
+                                ( theKnight.isLancelotW && character == Character::GUINEVERE );
+
+            bool win =  eternalLove                 ||
+                        (level >= level_oppnent)    ||
+                        (theKnight.lionHeart > 0)   ||
+                        (theKnight.odin > 0 && character == Character::DRAGONKNIGHT);
+            if (win)
+            {
+                theKnight.isMythril = true;
+                theKnight.nWin++;
+            }
+            else
+            {
+                if (!theKnight.isMythril)
+                    theKnight.HP = 0;
+                theKnight.nLose++;
+            }
+        } break;
 
         case Event::OMEGAWEAPON:
             if (!theKnight.winOmega)
             {
                 bool win = (theKnight.isExcalibur && theKnight.level == 10) ||
-                            (theKnight.character == Character::DRAGONKNIGHT && theKnight.lionHeart > 0);
+                            (character == Character::DRAGONKNIGHT && theKnight.lionHeart > 0);
                 if (win)
                 {
                     while (theKnight.level != 10)
@@ -274,7 +281,8 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
                 }
                 else
                 {
-                    theKnight.HP = 0;
+                    if (!theKnight.isMythril)
+                        theKnight.HP = 0;
                     theKnight.nLose++;
                 }
 
@@ -289,7 +297,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             }
             else if (level < level_oppnent)
             {
-                bool notDecrease = (theKnight.hakama) || (theKnight.character == Character::GUINEVERE);
+                bool notDecrease = (theKnight.hakama) || (character == Character::GUINEVERE);
                 if (!notDecrease)
                     theKnight.gil = MAX(1, theKnight.gil / 2);
                 theKnight.nLose++;
@@ -308,7 +316,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             }
             else if (level < level_oppnent)
             {
-                if (theKnight.character != Character::PALADIN && theKnight.character != Character::DRAGONKNIGHT)
+                if (character != Character::PALADIN && character != Character::DRAGONKNIGHT)
                     theKnight.poison = 6;
                 if (theKnight.poison > 0 && theKnight.antidote > 0)
                     theKnight.antidote--;
@@ -323,7 +331,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             if (opponent == Event::MOONBRINGER)
             {
                 gil = 150;
-                basedame = (theKnight.character == Character::GUINEVERE) ? 0.0f : 1.5f;
+                basedame = (character == Character::GUINEVERE) ? 0.0f : 1.5f;
             }
             else if (opponent == Event::ELF)
             {
@@ -341,7 +349,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
                 basedame = 8.5f;
             }
 
-            if (autowin || theKnight.character == Character::PALADIN)
+            if (autowin || character == Character::PALADIN)
             {
                 theKnight.gil = MIN(999, theKnight.gil + gil);
                 theKnight.nWin++;
@@ -426,7 +434,8 @@ void handle_event(ExKnight& theKnight, int event)
 
         // Event 11
         case Event::ODIN:
-            theKnight.odin = 6;
+            // -1 mean odin already dead.
+            theKnight.odin = (theKnight.odin == -1) ? -1 : 6;
             break;
 
         // Event 12
