@@ -38,6 +38,35 @@ TEST_CASE("Check dragon knight", "[check_dragonknight]") {
 }
 // }}}
 
+TEST_CASE("Check sum divisors", "[sum]")
+{
+    REQUIRE(sum_of_diviors(1) == 1);
+    REQUIRE(sum_of_diviors(30) == 72);
+    REQUIRE(sum_of_diviors(81) == 121);
+    REQUIRE(sum_of_diviors(17) == 18);
+    REQUIRE(sum_of_diviors(100) == 217);
+    REQUIRE(sum_of_diviors(108) == 280);
+    REQUIRE(sum_of_diviors(144) == 403);
+}
+
+TEST_CASE("Greatest common divisor", "[gcd]")
+{
+    REQUIRE(gcd(6, 18) == 6);
+    REQUIRE(gcd(17, 17) == 17);
+    REQUIRE(gcd(17, 13) == 1);
+    REQUIRE(gcd(54, 24) == 6);
+    REQUIRE(gcd(180, 48) == 12);
+}
+
+TEST_CASE("Friend Number", "[friend]")
+{
+    REQUIRE(is_friendly_number(30, 140));
+    REQUIRE(is_friendly_number(2480, 6200));
+    REQUIRE(is_friendly_number(135, 819));
+    REQUIRE(is_friendly_number(42, 544635));
+    REQUIRE(is_friendly_number(40640, 6200));
+}
+
 // {{{ [example]
 TEST_CASE("Run example", "[example]")
 {
@@ -215,7 +244,17 @@ TEST_CASE("Check fight", "[fight]")
 TEST_CASE("Check event", "[event]")
 {
     int mode = 0;
-    // TODO: NINA
+    //REQUIRE(is_friendly_number(135, 819));
+    // NINA: Friendly Number
+    {
+        int nPetal = 4;
+        set_knight(&theKnight, 30, 1, 0, 140);
+        castle arrCastle[] = { {{8, 99}, 2} };
+        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+        REQUIRE(compare_knight(&theKnight, 30, 1, 0, 140));
+        REQUIRE(compare_report(m_report, 2, 1, 0));
+        delete m_report;
+    }
 
     // Event Odin 11
     {

@@ -23,6 +23,9 @@ int hash(int eventCode)
 {
     return eventCode;
 }
+int sum_of_diviors(int N);
+int gcd(int a, int b);
+bool is_friendly_number(int a, int b);
 
 // {{{ Helper
 void set_knight(struct knight *theKnight, int HP, int level, int antidote, int gil)

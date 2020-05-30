@@ -8,9 +8,9 @@
     - [X] Fight: normal opponent (1, 2, 3, 4, 5, 6, 7, 99)
     - [X] Fight: hard opponent (13, 14)
 
-    - [ ] Event 8: Nina
+    - [X] Event 8: Nina
         - [X] Basic infrastructure.
-        - [ ] Friend number function
+        - [X] Friend number function
 
     - [X] Event 9: Durian forest
     - [X] Event 10: Antidote

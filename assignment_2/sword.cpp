@@ -120,9 +120,46 @@ Character get_character(int orignalHP)
 }
 // }}}
 // {{{ Check friendly number
+int sum_of_diviors(int N)
+{
+    if (N == 0) return 0;
+
+    int sum, i;
+    sum = 0;
+    for (i = 1; i*i <= N; ++i)
+        sum += !(N % i) ? (N/i) + i : 0;
+
+    i--;
+    sum -= (i*i) == N ? i : 0;
+    return sum;
+}
+
+int gcd(int a, int b)
+{
+    int temp;
+    if ( a < b )
+    {
+        temp = a; a = b; b = temp;
+    }
+
+    while(b != 0)
+    {
+        temp = a % b; a = b; b = temp;
+    }
+    return a;
+}
 bool is_friendly_number(int a, int b)
 {
-    return false;
+    if (a == 0 || b == 0) return false;
+    if (a == b) return true;
+
+    int sum_div_a = sum_of_diviors(a);
+    int sum_div_b = sum_of_diviors(b);
+
+    int gcd_a = gcd(sum_div_a, a);
+    int gcd_b = gcd(sum_div_b, b);
+
+    return (sum_div_a/gcd_a == sum_div_b/gcd_b) && (a/gcd_a == b/gcd_b);
 }
 // }}}
 // {{{ Helper function
@@ -371,13 +408,12 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
         custom_callPhoenix(theKnight);
 }
 // }}}
-
+// {{{ Handle event
 void handle_event(ExKnight& theKnight, int event)
 {
     switch (event)
     {
         // Event 8
-        // TODO: Implement Friend number function
         case Event::NINA: {
             bool isFriendly = is_friendly_number(theKnight.HP, theKnight.gil);
             bool free_lunch =   (theKnight.character == Character::GUINEVERE) || 
@@ -458,7 +494,7 @@ void handle_event(ExKnight& theKnight, int event)
             break;
     }
 }
-
+// }}}
 // {{{ Handle item
 void handle_item(struct ExKnight *theKnight, int event)
 {
@@ -496,7 +532,6 @@ void handle_item(struct ExKnight *theKnight, int event)
 
 
 report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode, int nPetal)
-//void  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode, int nPetal, report *r)
 {
     ExKnight theKnight;
     init_knight(&theKnight, oriKnight);
