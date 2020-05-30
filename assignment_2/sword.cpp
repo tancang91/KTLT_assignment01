@@ -411,20 +411,21 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
 // {{{ Handle event
 void handle_event(ExKnight& theKnight, int event)
 {
+    const Character character = theKnight.character;
     switch (event)
     {
         // Event 8
         case Event::NINA: {
             bool isFriendly = is_friendly_number(theKnight.HP, theKnight.gil);
-            bool free_lunch =   (theKnight.character == Character::GUINEVERE) || 
-                                (theKnight.character == Character::PALADIN)   ||
+            bool free_lunch =   (character == Character::GUINEVERE) ||
+                                (character == Character::PALADIN)   ||
                                 (theKnight.hakama);
 
             if (free_lunch)
             {
                 theKnight.HP = theKnight.maxHP;
                 theKnight.poison = 0;
-                if (theKnight.character == Character::GUINEVERE)
+                if (character == Character::GUINEVERE)
                     theKnight.gil = MIN(999, theKnight.gil + 50);
             }
             if (isFriendly)
@@ -433,7 +434,7 @@ void handle_event(ExKnight& theKnight, int event)
                 theKnight.poison = 0;
 
                 // Paladin will carry lion heart forever (999)
-                theKnight.lionHeart = theKnight.character == Character::PALADIN ? 999 : 6;
+                theKnight.lionHeart = (character == Character::PALADIN) ? 999 : 6;
             }
             else if (theKnight.gil >= 50)
             {
