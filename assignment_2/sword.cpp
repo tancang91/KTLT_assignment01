@@ -5,9 +5,10 @@
 
 
 /********* Begin My Implementation ***********/
+#define N_TREASURE 3
+
 #define MIN(a,b) ((a)<(b)) ? (a) : (b)
 #define MAX(a,b) ((a)>(b)) ? (a) : (b)
-
 
 // {{{ Data structure
 enum Event
@@ -49,6 +50,35 @@ struct ExKnight
     int nWin, nLose;
 
     Character character;
+};
+
+class Stack
+{
+    int arr[N_TREASURE];
+    int size;
+
+public:
+    Stack(): size(0) {}
+    bool isEmpty() {return size == 0;}
+    int top()
+    {
+        if (isEmpty())  return -999;
+        return arr[size-1];
+
+    }
+    int pop()
+    {
+        if (isEmpty())  return -999;
+
+        int val = arr[--size];
+        return val;
+    }
+
+    void push(int val)
+    {
+        if (size == N_TREASURE) return;
+        arr[size++] = val;
+    }
 };
 // }}}
 
@@ -240,6 +270,30 @@ void init_knight(ExKnight* exKnight ,knight& oriKnight)
         default:
             break;
     }
+}
+
+void init_item_order(Stack &itemOrder)
+{
+    int temp[3];
+    temp[0] = hash(Event::W_PALADIN);
+    temp[1] = hash(Event::W_LANCELOT);
+    temp[2] = hash(Event::W_GUINEVERE);
+
+    // Sort decreasing order
+    for (int i = 1; i < 3; ++i)
+    {
+        int t = temp[i];
+        int j = i;
+        while (j != 0 && temp[j-1] < t)
+        {
+            temp[j] = temp[j-1];
+            j--;
+        }
+        temp[j] = t;
+    }
+
+    for (int i = 0; i < 3; ++i)
+        itemOrder.push(temp[i]);
 }
 // }}}
 
@@ -497,23 +551,45 @@ void handle_event(ExKnight& theKnight, int event)
 }
 // }}}
 // {{{ Handle item
-void handle_item(struct ExKnight *theKnight, int event)
+void handle_item(struct ExKnight *theKnight, int event, Stack &s_itemOrder)
 {
+    const int hash_id = hash(event);
     switch (event)
     {
         // Event 95
         case Event::W_PALADIN:
-            theKnight->isPaladinW = true;
+
+            // Stack item order is empty either mode != 1 or
+            // All treasure items collected
+            if (s_itemOrder.isEmpty())
+                theKnight->isPaladinW = true;
+            else if (s_itemOrder.top() == hash_id)
+            {
+                theKnight->isPaladinW = true;
+                s_itemOrder.pop();
+            }
             break;
 
         // Event 96
         case Event::W_LANCELOT:
-            theKnight->isLancelotW = true;
+            if (s_itemOrder.isEmpty())
+                theKnight->isLancelotW = true;
+            else if (s_itemOrder.top() == hash_id)
+            {
+                theKnight->isLancelotW = true;
+                s_itemOrder.pop();
+            }
             break;
 
         // Event 97
         case Event::W_GUINEVERE:
-            theKnight->isGuinevere = true;
+            if (s_itemOrder.isEmpty())
+                theKnight->isGuinevere = true;
+            else if (s_itemOrder.top() == hash_id)
+            {
+                theKnight->isGuinevere = true;
+                s_itemOrder.pop();
+            }
             break;
 
         // Event 98
@@ -535,7 +611,13 @@ void handle_item(struct ExKnight *theKnight, int event)
 report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode, int nPetal)
 {
     ExKnight theKnight;
+    Stack s_itemOrder;
+
     init_knight(&theKnight, oriKnight);
+
+    // Configure get treasure item in order (small index first)
+    if (mode == 1)
+        init_item_order(s_itemOrder);
 
     // Game loop
     Game = GameState::RUNNING;
@@ -557,7 +639,7 @@ report*  game_main(knight& oriKnight, castle arrCastle[], int nCastle, int mode,
 
                 int event = events[j];
                 if (event >= 95 && event <= 98)
-                    handle_item(&theKnight, event);
+                    handle_item(&theKnight, event, s_itemOrder);
                 else if ((event >= 1 && event <= 7) || event == 99 || event == 13 || event == 14)
                     handle_fight(theKnight, event, j+1);
                 else
@@ -610,9 +692,10 @@ report*  walkthrough (knight& theKnight, castle arrCastle[], int nCastle, int mo
   int bFlag;
   //fighting for the existence of mankind here
 
- 
+
   // success or failure?
-  pReturn = (bFlag)? new report : NULL;
+  //pReturn = (bFlag)? new report : NULL;
+  pReturn = game_main(theKnight, arrCastle, nCastle, mode, nPetal);
   return pReturn;
 }
 

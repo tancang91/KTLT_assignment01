@@ -160,10 +160,10 @@ int callPhoenix(knight& woundedKnight, int MaxHP)
 }
 
 //for mode 1 only
-int hash(int eventCode)
-{
-	return eventCode;
-}
+//int hash(int eventCode)
+//{
+	//return eventCode;
+//}
 
 int main(int argc, char* argv[])
 {

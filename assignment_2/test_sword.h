@@ -6,6 +6,40 @@
 #define _definition_h_
 #endif
 
+namespace testing {
+
+#define N_TEST 5
+class Stack
+{
+    int arr[N_TEST];
+    int size;
+
+public:
+    Stack(): size(0) {}
+    bool isEmpty() {return size == 0;}
+    bool isFull() {return size == N_TEST;}
+    int top()
+    {
+        if (isEmpty())  return -999;
+        return arr[size-1];
+
+    }
+    int pop()
+    {
+        if (isEmpty())  return -999;
+
+        int val = arr[--size];
+        return val;
+    }
+
+    void push(int val)
+    {
+        if (size == N_TEST) return;
+        arr[size++] = val;
+    }
+};
+} // End namspace Testing
+
 bool check_prime(int number);
 bool check_dragonknight(int number);
 
@@ -21,8 +55,12 @@ int callPhoenix(knight& woundedKnight, int MaxHP)
 
 int hash(int eventCode)
 {
+    if (eventCode == 95) return 2;
+    if (eventCode == 96) return 1;
+    if (eventCode == 97) return 3;
     return eventCode;
 }
+
 int sum_of_diviors(int N);
 int gcd(int a, int b);
 bool is_friendly_number(int a, int b);

@@ -67,6 +67,54 @@ TEST_CASE("Friend Number", "[friend]")
     REQUIRE(is_friendly_number(40640, 6200));
 }
 
+#if 0
+TEST_CASE("Stack", "[stack]")
+{
+    testing::Stack s;
+    REQUIRE(s.isEmpty());
+
+    for (int i = 1; i <= 4; ++i)
+        s.push(i);
+
+    REQUIRE(!s.isFull());
+    s.push(5);
+    REQUIRE(s.isFull());
+
+    SECTION("Pop Stack")
+    {
+        for (int i = 5; i > 0; --i)
+        {
+            REQUIRE(s.pop() == i);
+        }
+
+        REQUIRE(s.isEmpty());
+        REQUIRE(s.top() == -999);
+    }
+}
+
+TEST_CASE("Sorting", "[sort]")
+{
+    int temp[3];
+    temp[0] = 11;
+    temp[1] = 56;
+    temp[2] = 12;
+    for (int i = 1; i < 3; ++i)
+    {
+        int t = temp[i];
+        int j = i;
+        while (j != 0 && temp[j-1] < t)
+        {
+            temp[j] = temp[j-1];
+            j--;
+        }
+        temp[j] = t;
+    }
+
+    for (int i = 1; i < 3; ++i)
+        REQUIRE(temp[i-1] >= temp[i]);
+}
+#endif
+
 // {{{ [example]
 TEST_CASE("Run example", "[example]")
 {
@@ -195,6 +243,17 @@ TEST_CASE("Run example", "[example]")
         m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
         REQUIRE(compare_knight(&theKnight, 999, 2, 1, 100));
         REQUIRE(compare_report(m_report, 0, 1, 0));
+        delete m_report;
+    }
+
+    // Example 10 (mode 1)
+    {
+        int nPetal = 12;
+        set_knight(&theKnight, 4, 1, 0, 100);
+        castle arrCastle[] = { {{95,96,97,98,99}, 5} };
+        m_report = game_main(theKnight, arrCastle, 1, 1, nPetal);
+        REQUIRE(compare_knight(&theKnight, 1, 2, 0, 100));
+        REQUIRE(compare_report(m_report, 2, 1, 1));
         delete m_report;
     }
 }

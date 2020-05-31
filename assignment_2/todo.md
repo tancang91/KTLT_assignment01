@@ -19,7 +19,7 @@
     - [X] Event 15: Scarlet Hakama
     - [X] Event 16: LockedDoor
 
-    - [ ] Mode 1
+    - [X] Mode 1
     - [ ] Mode 2
 
 ## Unit test
