@@ -31,3 +31,4 @@
     - [X] Fight: Guinevere character ability when lost the fight.
     - [X] Arthur character do not care about Canh Hoa Hong.
     - [X] LionHeart ability.
+    - [X] MaxHP only increase when level change (iff level < 10 and increase level)

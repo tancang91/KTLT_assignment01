@@ -225,8 +225,11 @@ int custom_callPhoenix(ExKnight &exKnight)
 
 void increase_level(ExKnight &exKnight)
 {
-    exKnight.level = MIN(10, exKnight.level + 1);
-    exKnight.maxHP = MIN(999, exKnight.maxHP + 100);
+    if (exKnight.level < 10)
+    {
+        exKnight.level++;
+        exKnight.maxHP = MIN(999, exKnight.maxHP + 100);
+    }
 }
 
 void init_knight(ExKnight* exKnight ,knight& oriKnight)
