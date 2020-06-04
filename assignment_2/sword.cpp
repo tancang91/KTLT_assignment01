@@ -317,10 +317,13 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
 
     switch (opponent) {
         case Event::ULTIMECIA:
+            if (theKnight.poison > 0)
+                theKnight.HP = MAX(1, theKnight.HP / 3);
+
             if (theKnight.isExcalibur || theKnight.lionHeart > 0)
             {
-                if (theKnight.poison > 0)
-                    theKnight.HP = MAX(1, theKnight.HP / 3);
+                //if (theKnight.poison > 0)
+                    //theKnight.HP = MAX(1, theKnight.HP / 3);
 
                 Game = GameState::FINISHED;
                 theKnight.nWin++;
@@ -413,7 +416,10 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
                 if (character != Character::PALADIN && character != Character::DRAGONKNIGHT)
                     theKnight.poison = 6;
                 if (theKnight.poison > 0 && theKnight.antidote > 0)
+                {
                     theKnight.antidote--;
+                    theKnight.poison = 0;
+                }
 
                 theKnight.nLose++;
             }
@@ -443,13 +449,16 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
                 basedame = 8.5f;
             }
 
+            if(theKnight.poison > 0)
+                theKnight.HP = (int)(theKnight.HP - level_oppnent*basedame*10.0f);
+
             if (autowin || character == Character::PALADIN)
             {
                 theKnight.gil = MIN(999, theKnight.gil + gil);
                 theKnight.nWin++;
 
-                if(theKnight.poison > 0)
-                    theKnight.HP = (int)(theKnight.HP - level_oppnent*basedame*10.0f);
+                //if(theKnight.poison > 0)
+                    //theKnight.HP = (int)(theKnight.HP - level_oppnent*basedame*10.0f);
             }
             else if (level < level_oppnent)
             {
