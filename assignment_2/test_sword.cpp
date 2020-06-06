@@ -303,15 +303,39 @@ TEST_CASE("Check fight", "[fight]")
 TEST_CASE("Check event", "[event]")
 {
     int mode = 0;
-    //REQUIRE(is_friendly_number(135, 819));
-    // NINA: Friendly Number
-    {
-        int nPetal = 4;
+    SECTION("NINA") {
+        int nPetal = 20;
         set_knight(&theKnight, 30, 1, 0, 140);
-        castle arrCastle[] = { {{8, 99}, 2} };
-        m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
-        REQUIRE(compare_knight(&theKnight, 30, 1, 0, 140));
-        REQUIRE(compare_report(m_report, 2, 1, 0));
+
+        SECTION("Friendly number") {
+            castle arrCastle[] = { {{8, 95, 96, 97, 1, 99}, 6} };
+            m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+            REQUIRE(compare_knight(&theKnight, 30, 1, 0, 240));
+            REQUIRE(compare_report(m_report, 14, 2, 0));
+        }
+
+        SECTION("Friendly number expire") {
+            castle arrCastle[] = { {{8, 95, 96, 97, 2, 98, 1, 99}, 8} };
+            m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+            REQUIRE(compare_knight(&theKnight, 15, 1, 0, 190));
+            REQUIRE(compare_report(m_report, 12, 2, 1));
+        }
+
+        SECTION("Basic: Not enough gil") {
+            set_knight(&theKnight, 200, 1, 0, 50);
+            castle arrCastle[] = { {{95, 96, 97, 98, 10, 1, 8, 99}, 8} };
+            m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+            REQUIRE(compare_knight(&theKnight, 190, 1, 1, 0));
+            REQUIRE(compare_report(m_report, 12, 1, 1));
+        }
+
+        SECTION("Basic: Enough gil") {
+            set_knight(&theKnight, 200, 1, 0, 160);
+            castle arrCastle[] = { {{95, 96, 97, 98, 1, 8, 99}, 7} };
+            m_report = game_main(theKnight, arrCastle, 1, mode, nPetal);
+            REQUIRE(compare_knight(&theKnight, 200, 1, 0, 110));
+            REQUIRE(compare_report(m_report, 13, 1, 1));
+        }
         delete m_report;
     }
 
@@ -319,12 +343,12 @@ TEST_CASE("Check event", "[event]")
     {
         int nPetal = 12;
         set_knight(&theKnight, 172, 1, 0, 100);
-        castle arrCastle[] = { {{11, 95, 96, 97, 98, 6}, 6},
+        castle arrCastle[] = { {{11, 95, 96, 97, 98, 3, 1}, 7},
                     {{1, 99}, 2},
         };
         m_report = game_main(theKnight, arrCastle, 3, mode, nPetal);
-        REQUIRE(theKnight.HP == 172);
-        REQUIRE(compare_report(m_report, 4, 3, 0));
+        REQUIRE(theKnight.HP == 102); REQUIRE(theKnight.gil == 650);
+        REQUIRE(compare_report(m_report, 3, 3, 1));
         delete m_report;
     }
 
