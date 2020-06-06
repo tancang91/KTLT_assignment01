@@ -396,7 +396,7 @@ void handle_fight(ExKnight& theKnight, int opponent, int eventNum)
             {
                 bool notDecrease = (theKnight.hakama) || (character == Character::GUINEVERE);
                 if (!notDecrease)
-                    theKnight.gil = MAX(1, theKnight.gil / 2);
+                    theKnight.gil = theKnight.gil / 2;
                 theKnight.nLose++;
             }
             break;
